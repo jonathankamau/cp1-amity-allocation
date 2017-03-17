@@ -35,12 +35,12 @@ These are instructions for setting up the Amity app in development environment.
 
       $ git clone Setting Up for Development
 
-These are instructions for setting up HealthChecks Django app in development environment.
+These are instructions for setting up Amity app in development environment.
 
     prepare directory for project code and virtualenv:
 
-      $ mkdir -p ~/webapps
-      $ cd ~/webapps
+      $ mkdir -p ~/amity
+      $ cd ~/amity
 
     prepare virtual environment (with virtualenv you get pip, we'll use it soon to install requirements):
 
@@ -49,11 +49,15 @@ These are instructions for setting up HealthChecks Django app in development env
 
     check out project code:
 
-      $ git clone https://github.com/jonathankamau/cp1-amity-allocation
+      $ git clone https://github.com/jonathankamau/cp1-amity-allocation.git
 
     install requirements into virtualenv:
 
       $ pip install -r cp1-amity-allocation/requirements.txt
+
+      Run the application using the following command:
+
+      $ python app.py
 
 
 
