@@ -95,12 +95,69 @@ class AmityTest(unittest.TestCase):
        sample_person = "Francis"
        file_open = self.amity.load_people()
        self.assertIn(sample_person, file_open, msg="Cannot find name")
-    def test_reallocate_room(self):
-        pass
-    
+    def test_reallocate_fellow_office(self):
+        sample_id = "ST012"
+        sample_room = "Valhalla"
+        fname = str(self.amity.fellow_dict.get(sample_id))  
+        fel = self.amity.reallocate_fellow_office(sample_id, sample_room)
+        self.assertEqual(fel, fname+" reallocated successfully to "+sample_room, msg="Not reallocated")
+
+    def test_reallocate_staff_office(self):
+        sample_id = "F012"
+        sample_room = "Valhalla"
+        fname = str(self.amity.staff_dict.get(sample_id))  
+        fel = self.amity.reallocate_staff_office(sample_id, sample_room)
+        self.assertEqual(fel, fname+" reallocated successfully to "+sample_room, msg="Not reallocated")
+
+    def test_reallocate_fellow_living_space(self):
+        sample_id = "ST012"
+        sample_room = "Valhalla"
+        fname = str(self.amity.fellow_dict.get(sample_id))  
+        fel = self.amity.reallocate_fellow_living_space(sample_id, sample_room)
+        self.assertEqual(fel, fname+" reallocated successfully to "+sample_room, msg="Not reallocated")
+
+    def test_add_person_isint(self):
+        self.assertNotIsInstance(self.amity.add_person("Ben", "FELLOW"), int)
+    def test_add_person_isdict(self):
+        self.assertNotIsInstance(self.amity.add_person("Ben", "FELLOW"), dict)
+    def test_add_person_isstring(self):
+        self.assertIsInstance(self.amity.add_person("Ben", "FELLOW"), str)
+    def test_add_person_islist(self):
+        self.assertNotIsInstance(self.amity.add_person("Ben", "FELLOW"), list)
+    def test_create_room_isint(self):
+        self.assertNotIsInstance(self.amity.create_room("Voi", "Living Space"), int)
+    def test_create_room_isdict(self):
+        self.assertNotIsInstance(self.amity.create_room("Voi", "Living Space"), dict)
+    def test_create_room_islist(self):
+        self.assertNotIsInstance(self.amity.create_room("Voi", "Living Space"), list)
+    def test_create_room_isstring(self):
+        self.assertIsInstance(self.amity.create_room("Voi", "Living Space"), list)
+    def test_allocate_fellow_office_isstring(self):
+        fel_office = self.amity.allocate_fellow_office("Alex", "F002")
+        self.assertIsInstance(fel_office, str)
+    def test_allocate_fellow_living_space_isstring(self):
+        fel_ls = self.amity.allocate_fellow_livingspace("Alex", "F002")
+        self.assertIsInstance(fel_ls, str)
+    def test_allocate_staff_office_isstring(self):
+        staf_office = self.amity.allocate_staff_office("Hellen", "ST002")
+        self.assertIsInstance(staf_office, str)
+    def test_load_people_isistring(self):
+        self.assertIsInstance(self.amity.load_people(), str)
+    def test_reallocate_fellow_office_isstring(self): 
+        fel = self.amity.reallocate_fellow_office("ST012", "Valhalla")
+        self.assertIsInstance(fel, str)
+    def test_reallocate_staff_office_isstring(self):
+        fel = self.amity.reallocate_staff_office("F012", "Valhalla")
+        self.assertIsInstance(fel, str)
+    def test_reallocate_fellow_living_space_isstring(self):
+        fel = self.amity.reallocate_fellow_living_space("ST012", "Valhalla")
+        self.assertIsInstance(fel, str)
 
 
-    
+
+
+
+
 
     def tearDown(self):
         """ """
