@@ -9,158 +9,214 @@ class AmityTest(unittest.TestCase):
         self.room = Room()
         self.office = Office()
         self.livingspace = LivingSpace
-        self.room_name = 'Hyena'
-        self.room_type = 'Living Space'
         self.room_capacity = 5
         self.person = Person()
         self.fellow = Fellow()
         self.staff = Staff()
         self.amity = Amity()
+        self.testperson = "Jon"
 
-    def test_for_livingspace_inheritance(self):
-        self.assertTrue( issubclass(LivingSpace, Room) )
+    def test_living_space_inheritance(self):
+        """ Tests if living space class inherits from room class """
+        self.assertTrue(issubclass(LivingSpace, Room))
 
     def test_for_office_inheritance(self):
-        self.assertTrue( issubclass(Office, Room ) )  
+        """ Tests if office class inherits from room class """
+        self.assertTrue(issubclass(Office, Room))
+
     def test_for_room_added(self):
+        # a test must have just one reason to fail.
+        """ Tests if room has been added """
         room1 = "Forest"
         roomtype = "Office"
         list1 = len(self.amity.all_rooms)
         self.assertEqual(list1, 0)
         returnmsg = "Created Room Successfully"
-        self.assertEqual(self.amity.create_room(room1,roomtype), returnmsg, msg="Room not successfully created")
+        room_create = self.amity.create_room(room1, roomtype)
+        self.assertEqual(room_create, returnmsg, msg="Room not successfully created")
         list2 = len(self.amity.all_rooms)
-        self.assertNotEqual(list1,list2,"Lists are equal")
-        #self.assertEqual(len(living_space_list), 0)
+        self.assertNotEqual(list1, list2, msg="Lists are equal")
+
     def test_office_capacity(self):
-        self.assertEqual(self.office.max_capacity, 8)
+        """ checks if capacity of office has exceeded max limit """
+        officespace = "Hogwarts"
+        officelist = list(self.amity.office_occupied.values())
+        officecounter = officelist.count(officespace)
+        self.assertLessEqual(officecounter, self.office.max_capacity, msg="Exceeded maximum limit!")
+
     def test_living_space_capacity(self):
-        self.assertEqual(self.livingspace.max_capacity, 20)
+        """ tests if living space capacity has exceeded max limit """
+        livingspace = "Kenya"
+        lslist = list(self.amity.living_space_occupied.values())
+        lscount = lslist.count(livingspace)
+        self.assertLessEqual(lscount, self.livingspace.max_capacity, msg="Exceeded maximum limit!")
+
 
     def test_for_fellow_inheritance(self):
-        self.assertTrue( issubclass(Fellow, Person) )
+        """ tests if fellow class inherits from person class """
+        self.assertTrue(issubclass(Fellow, Person))
 
     def test_for_staff_inheritance(self):
-        self.assertTrue( issubclass(Staff, Person) )
+        """ tests if staff class inherits from person class """
+        self.assertTrue(issubclass(Staff, Person))
 
-    def test_for_personexists(self):
-        self.assertEqual(self.amity.all_people,"jonatha")
-    
+    def test_if_person_exists(self):
+        """ tests if person exists in person list """
+        self.assertIn(self.testperson, self.amity.all_people, msg="Person not found")
+
     def test_add_person(self):
+        """ tests if person was added """
         person1 = "Ben"
         status1 = "FELLO"
         list3 = len(self.amity.all_people)
-        self.assertEqual(list3,0)
+        self.assertEqual(list3, 0)
         list4 = len(self.amity.all_people)
-        self.assertEqual(self.amity.add_person(person1, status1),"Fellow Added Successfully",msg="Fellow was not added successfully")
+        self.assertEqual(list3, list4)
+        amity_add = self.amity.add_person(person1, status1)
+        self.assertEqual(amity_add, "Fellow Added Successfully", msg="Not added successfully")
 
     def test_if_added_fellow_is_stored(self):
+        """ tests if fellow added was stored """
         person1 = "Bee"
         status1 = "FELLO"
         self.amity.add_person(person1, status1)
-        self.assertEqual(self.amity.add_person(person1, status1),"Fellow Added Successfully",msg="Fellow was not added successfully")
-        for x, y in self.amity.fellow_dict.items():
-            if y==person1:
-                self.assertEqual(person1, y, "Not Found")
-            
+        amity_added = self.amity.add_person(person1, status1)
+        self.assertEqual(amity_added, "Fellow Added Successfully", msg="Not stored successfully")
+        for test_person in self.amity.fellow_dict.items():
+            if test_person == person1:
+                self.assertEqual(person1, test_person, msg="Not Found")
 
-    def test_for_created_living_space(self):
+    def test_create_living_space(self):
+        """ tests if living space was created successfully """
         room1 = "ChillZone"
         roomtype = "Living Spac"
         list1 = len(self.amity.all_rooms)
         self.assertEqual(list1, 0)
         returnmsg = "living space created successfully"
-        self.assertEqual(self.amity.create_room(room1,roomtype), returnmsg, msg="Living space not successfully created")
+        test_ls = self.amity.create_room(room1, roomtype)
+        self.assertEqual(test_ls, returnmsg, msg="Living space not successfully created")
         list2 = len(self.amity.all_rooms)
-        self.assertNotEqual(list1,list2,"Lists are equal")
-       
+        self.assertNotEqual(list1, list2, msg="Lists are equal")
+
     def test_assign_fellow_office(self):
-         fellow_name = "Alex"
-         fellow_id = "F002"
-         fel_office = self.amity.allocate_fellow_office(fellow_name, fellow_id)
-         self.assertEqual(fel_office, "Office assigned successfully to "+fellow_name, msg="Not Assigned")
+        """ tests if fellow was assigned office """
+        fellow_name = "Alex"
+        fellow_id = "F002"
+        fel_office = self.amity.allocate_fellow_office(fellow_name, fellow_id)
+        fel_msg = "Office assigned successfully to "+fellow_name
+        self.assertEqual(fel_office, fel_msg, msg="Not Assigned")
 
     def test_assign_staff_office(self):
+        """ tests if staff was assigned office """
         staff_name = "Hellen"
         staff_id = "ST002"
         staf_office = self.amity.allocate_staff_office(staff_name, staff_id)
-        self.assertEqual(staf_office, "Office assigned successfully to "+staff_name, msg="Not Assigned")
+        staf_msg = "Office assigned successfully to "+staff_name
+        self.assertEqual(staf_office, staf_msg, msg="Not Assigned")
 
     def test_assign_fellow_living_space(self):
+        """ checks if fellow was assigned living space """
         fellow_name = "Alex"
         fellow_id = "F002"
         fel_ls = self.amity.allocate_fellow_livingspace(fellow_name, fellow_id)
-        self.assertEqual(fel_ls, "Living Space assigned successfully to "+fellow_name, msg="Not Assigned")
-    def test_for_file_open(self):
-       sample_person = "Francis"
-       file_open = self.amity.load_people()
-       self.assertIn(sample_person, file_open, msg="Cannot find name")
+        fel_msg = "Living Space assigned successfully to "+fellow_name
+        self.assertEqual(fel_ls, fel_msg, msg="Not Assigned")
+
+    def test_if_person_file_exists(self):
+        """ tests if file exists """
+        filetitle = "personnel.txt"
+        self.assertEqual(filetitle, self.amity.loadpeople, msg="file not found!")
+
+    def test_if_file_is_open(self):
+        """ tests if file was opened successfully """
+        filetitle = "personnel.txt"
+        sample_person = "Francis"
+        file_open = self.amity.load_people(filetitle)
+        self.assertIn(sample_person, file_open, msg="Cannot find name")
+
     def test_reallocate_fellow_office(self):
+        """ tests if fellow was reallocated office """
         sample_id = "ST012"
         sample_room = "Valhalla"
-        fname = str(self.amity.fellow_dict.get(sample_id))  
+        fname = str(self.amity.fellow_dict.get(sample_id))
         fel = self.amity.reallocate_fellow_office(sample_id, sample_room)
-        self.assertEqual(fel, fname+" reallocated successfully to "+sample_room, msg="Not reallocated")
+        fel_msg = "reallocated successfully to "+sample_room
+        self.assertEqual(fel, fname+fel_msg, msg="Not reallocated")
 
     def test_reallocate_staff_office(self):
+        """ tests if staff was reallocated to an office """
         sample_id = "F012"
         sample_room = "Valhalla"
-        fname = str(self.amity.staff_dict.get(sample_id))  
-        fel = self.amity.reallocate_staff_office(sample_id, sample_room)
-        self.assertEqual(fel, fname+" reallocated successfully to "+sample_room, msg="Not reallocated")
+        fname = str(self.amity.staff_dict.get(sample_id))
+        staf = self.amity.reallocate_staff_office(sample_id, sample_room)
+        staf_msg = fname+" reallocated successfully to "+sample_room
+        self.assertEqual(staf, staf_msg, msg="Not reallocated")
 
-    def test_reallocate_fellow_living_space(self):
+    def test_reallocates_fellow_ls(self):
+        """ tests if fellow was reallocated to a living space """
         sample_id = "ST012"
         sample_room = "Valhalla"
-        fname = str(self.amity.fellow_dict.get(sample_id))  
+        fname = str(self.amity.fellow_dict.get(sample_id))
         fel = self.amity.reallocate_fellow_living_space(sample_id, sample_room)
-        self.assertEqual(fel, fname+" reallocated successfully to "+sample_room, msg="Not reallocated")
+        fel_msg = fname+" assigned successfully to "+sample_room
+        self.assertEqual(fel, fel_msg, msg="Not reallocated")
 
-    def test_add_person_isint(self):
-        self.assertNotIsInstance(self.amity.add_person("Ben", "FELLOW"), int)
-    def test_add_person_isdict(self):
-        self.assertNotIsInstance(self.amity.add_person("Ben", "FELLOW"), dict)
+    def test_print_allocations(self):
+        """ prints room allocations """
+        fname = " "
+        self.assertIn(self.amity.print_allocations(fname), "Camelot", msg="Could not find item!")
+
+    def test_print_unallocated(self):
+        """ prints unallocated staff and fellows """
+        fname = " "
+        self.assertIn(self.amity.print_unallocated(fname), "Alex", msg="Could not find item!")
+
+    def test_prints_room(self):
+        """ tests if it prints list of people in a room """
+        roomname = "Valhalla"
+        self.assertIn(self.amity.print_room(roomname), "Alex", msg="Could not find person!")
+
     def test_add_person_isstring(self):
+        """ test if output for add person method is a string """
         self.assertIsInstance(self.amity.add_person("Ben", "FELLOW"), str)
-    def test_add_person_islist(self):
-        self.assertNotIsInstance(self.amity.add_person("Ben", "FELLOW"), list)
-    def test_create_room_isint(self):
-        self.assertNotIsInstance(self.amity.create_room("Voi", "Living Space"), int)
-    def test_create_room_isdict(self):
-        self.assertNotIsInstance(self.amity.create_room("Voi", "Living Space"), dict)
-    def test_create_room_islist(self):
-        self.assertNotIsInstance(self.amity.create_room("Voi", "Living Space"), list)
+
     def test_create_room_isstring(self):
+        """ tests if output for create room method is a string """
         self.assertIsInstance(self.amity.create_room("Voi", "Living Space"), list)
-    def test_allocate_fellow_office_isstring(self):
+
+    def test_allocate_fell_office_str(self):
+        """ tests if output for allocate fellow office method is a string """
         fel_office = self.amity.allocate_fellow_office("Alex", "F002")
         self.assertIsInstance(fel_office, str)
-    def test_allocate_fellow_living_space_isstring(self):
+
+    def test_allocate_fellow_ls_isstring(self):
+        """" checks if output for allocate fellow living space method is a string """
         fel_ls = self.amity.allocate_fellow_livingspace("Alex", "F002")
         self.assertIsInstance(fel_ls, str)
-    def test_allocate_staff_office_isstring(self):
+
+    def test_allocate_staff_office_output_is_string(self):
+        """ tests if output for allocate staff office is a string """
         staf_office = self.amity.allocate_staff_office("Hellen", "ST002")
         self.assertIsInstance(staf_office, str)
-    def test_load_people_isistring(self):
-        self.assertIsInstance(self.amity.load_people(), str)
-    def test_reallocate_fellow_office_isstring(self): 
-        fel = self.amity.reallocate_fellow_office("ST012", "Valhalla")
+
+    def test_reallocate_fellow_off_str(self):
+        """ tests if reallocate_fellow_office method returns a string """
+        fel = self.amity.reallocate_fellow_office("F012", "Valhalla")
         self.assertIsInstance(fel, str)
-    def test_reallocate_staff_office_isstring(self):
-        fel = self.amity.reallocate_staff_office("F012", "Valhalla")
+
+    def test_reallocate_staff_off_isstr(self):
+        """ tests if reallocate_staff_office method returns a string """
+        fel = self.amity.reallocate_staff_office("ST012", "Valhalla")
         self.assertIsInstance(fel, str)
-    def test_reallocate_fellow_living_space_isstring(self):
+
+    def test_reallocate_fellow_ls_isstr(self):
+        """ tests if reallocate_fellow_living_space returns a string """
         fel = self.amity.reallocate_fellow_living_space("ST012", "Valhalla")
         self.assertIsInstance(fel, str)
 
-
-
-
-
-
-
     def tearDown(self):
-        """ """
+        """ free up resources """
+        pass
 
 
 if __name__ == '__main__':
