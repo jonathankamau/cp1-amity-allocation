@@ -1,5 +1,3 @@
-#from .person import Person, Fellow, Staff
-#from .room import LivingSpace, Office
 import os.path
 class Amity:
     room_capacity = 6
@@ -12,10 +10,14 @@ class Amity:
         self.office_dict = {"Hogwarts":"O", "Bootcamp":"V", "Vienna":"O", "Valhalla":"V"}
         self.all_people = []
         self.fellow_dict = {"F002":"Alex", "F003":"John", "F005":"Terry", "F006":"Fred"}
-        self.office_occupied = {"F002": "Hogwarts", "ST002":"Vienna", "F006":"Valhalla"}
-        self.living_space_occupied = {"F005":"Kenya"}
+        self.office_occupied = {"F002": "Hogwarts", "ST002":"Vienna", "F006":"Valhalla",
+                                "F018":"Hogwarts", "F023":"Hogwarts", "F024":"Hogwarts",
+                                "F025":"Hogwarts", "F026":"Hogwarts", "F027":"Hogwarts"}
+        self.living_space_occupied = {"F005":"Kenya", "F009":"Kenya",
+                                      "F010":"Kenya", "F013":"Kenya", "F019":"Kenya"}
         self.staff_dict = {"ST001":"Musa", "ST002":"Hellen"}
         self.person_room_dict = {3:"Machakos", 5:"Kisumu"}
+        self.loadpeople = "persons.txt"
 
     def add_person(self, name, status):
         """ adds a person """
@@ -85,13 +87,38 @@ class Amity:
                              #return "Office assigned successfully to %s", name
                              return
 
-    def load_people(self):
+    def load_people(self, filename):
+        filename = self.loadpeople
         scriptpath = os.path.dirname(__file__)
-        filename = os.path.join(scriptpath, 'persons.txt')
-        f = open(filename)
-        persons = f.read()
-        #return persons
+        filetitle = os.path.join(scriptpath, filename)
+        fileopen = open(filetitle)
+        persons = fileopen.read()
+        fileopen.close()
         return persons
+
+    def print_room(self, roomname):
+        return roomname.upper()+"\n"
+        fellow_dict.update(staff_dict)
+        for keyAmity, valueAmity in fellow_dict.items():
+            for keyOffice, valueOffice in office_occupied.items():
+                if str(keyOffice) == str(keyAmity) and valueOffice == roomname:
+                    return valueAmity+"\n"
+    
+    def print_allocations(self, filename):
+        if filename == " ":
+            self.fellow_dict.update(self.staff_dict)
+            for keyAmity, valueAmity in self.fellow_dict.items():
+                for keyOffice, valueOffice in self.office_occupied.items():
+                    if str(keyOffice) == str(keyAmity):
+                        return valueOffice+"\n ----------\n"+valueAmity+"\n"
+
+    def print_unallocated(self, filename):
+        if filename == " ":
+            self.fellow_dict.update(self.staff_dict)
+            for keyAmity, valueAmity in self.fellow_dict.items():
+                for keyOffice, valueOffice in self.office_occupied.items():
+                    if str(keyOffice) != str(keyAmity):
+                        return keyAmity+" : "+valueAmity+"\n"
 
     def reallocate_fellow_office(self, person_id, room_name):
         """ reallocates fellow office """
@@ -125,7 +152,8 @@ class Amity:
                      break
                  break     
              else:
-                 return "Could not reallocate Staff! Check ID and try again"
+                 return
+                 #return "Could not reallocate Staff! Check ID and try again"
                  break
 
     def reallocate_fellow_living_space(self, person_id, room_name):
@@ -136,15 +164,12 @@ class Amity:
                      if a == room_name:
                          self.living_space_occupied[x]=a
                          if b == "V":
-                             self.self.living_space_dict[a] = "O"
-                         return y+" assigned successfully to "+a
+                             self.living_space_dict[a] = "O"
+                             return
+                         #return y+" assigned successfully to "+a
                          break
                      break
              else:
-                 return "Could not reallocate Fellow! Check ID and try again"
+                 return
+                 #return "Could not reallocate Fellow! Check ID and try again"
                  break
-        
-    
-
-    #def assigns_room
-    
