@@ -1,4 +1,5 @@
 import unittest
+import os
 from ..room import Room, Office, LivingSpace
 from ..amity import Amity
 from ..person import Person, Fellow, Staff
@@ -162,14 +163,24 @@ class AmityTest(unittest.TestCase):
         self.assertEqual(fel, fel_msg, msg="Not reallocated")
 
     def test_print_allocations(self):
-        """ prints room allocations """
-        fname = " "
-        self.assertIn(self.amity.print_allocations(fname), "Camelot", msg="Could not find item!")
+        """ tests if it prints room allocations """
+        fname = "allocate.txt"
+        self.amity.print_allocations(fname)
+        scriptpath = os.path.dirname(__file__)
+        filetitle = os.path.join(scriptpath, fname)
+        fileopen = open(filetitle)
+        persons = fileopen.read()
+        self.assertIn('Hogwarts', persons, msg="Not found!")
 
     def test_print_unallocated(self):
-        """ prints unallocated staff and fellows """
-        fname = " "
-        self.assertIn(self.amity.print_unallocated(fname), "Alex", msg="Could not find item!")
+        """ tests if it prints unallocated staff and fellows """
+        fname = "unallocated.txt"
+        self.amity.print_allocations(fname)
+        scriptpath = os.path.dirname(__file__)
+        filetitle = os.path.join(scriptpath, fname)
+        fileopen = open(filetitle)
+        persons = fileopen.read()
+        self.assertIn('Alex', persons, msg="Not found!")
 
     def test_prints_room(self):
         """ tests if it prints list of people in a room """
@@ -186,15 +197,15 @@ class AmityTest(unittest.TestCase):
 
     def test_allocate_fell_office_str(self):
         """ tests if output for allocate fellow office method is a string """
-        fel_office = self.amity.allocate_fellow_office("Alex", "F002")
-        self.assertIsInstance(fel_office, str)
+        fellowoffice = self.amity.allocate_fellow_office("Alex", "F002")
+        self.assertIsInstance(fellowoffice, str)
 
-    def test_allocate_fellow_ls_isstring(self):
+    def test_allocate_fellow_ls_for_str(self):
         """" checks if output for allocate fellow living space method is a string """
-        fel_ls = self.amity.allocate_fellow_livingspace("Alex", "F002")
-        self.assertIsInstance(fel_ls, str)
+        fellowliving = self.amity.allocate_fellow_livingspace("Alex", "F002")
+        self.assertIsInstance(fellowliving, str)
 
-    def test_allocate_staff_office_output_is_string(self):
+    def test_allocate_staff_office_str(self):
         """ tests if output for allocate staff office is a string """
         staf_office = self.amity.allocate_staff_office("Hellen", "ST002")
         self.assertIsInstance(staf_office, str)
@@ -213,6 +224,12 @@ class AmityTest(unittest.TestCase):
         """ tests if reallocate_fellow_living_space returns a string """
         fel = self.amity.reallocate_fellow_living_space("ST012", "Valhalla")
         self.assertIsInstance(fel, str)
+
+    def test_creates_db(self):
+        "Tests if a db is created successfully"
+        self.amity.save_state('amitydb')
+        self.assertTrue(os.path.isfile('amitydb.sqlite'))
+
 
     def tearDown(self):
         """ free up resources """
