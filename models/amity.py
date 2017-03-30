@@ -105,12 +105,18 @@ class Amity:
                     return valueAmity+"\n"
     
     def print_allocations(self, filename):
-        if filename == " ":
             self.fellow_dict.update(self.staff_dict)
             for keyAmity, valueAmity in self.fellow_dict.items():
                 for keyOffice, valueOffice in self.office_occupied.items():
-                    if str(keyOffice) == str(keyAmity):
+                    if str(keyOffice) == str(keyAmity) and filename == " ":
                         return valueOffice+"\n ----------\n"+valueAmity+"\n"
+                    elif str(keyOffice) == str(keyAmity) and filename != " ":
+                        scriptpath = os.path.dirname(__file__)
+                        filetitle = os.path.join(scriptpath, filename)
+                        filecontent = valueOffice+"\n ----------\n"+valueAmity+"\n"
+                        fileopen = open(filetitle, "w+")
+                        persons = fileopen.write(filecontent)
+                        fileopen.close()
 
     def print_unallocated(self, filename):
         if filename == " ":
@@ -155,7 +161,7 @@ class Amity:
                  return
                  #return "Could not reallocate Staff! Check ID and try again"
                  break
-
+    
     def reallocate_fellow_living_space(self, person_id, room_name):
      """ reallocates fellow living space """
      for x, y in self.fellow_dict.items():
@@ -173,3 +179,6 @@ class Amity:
                  return
                  #return "Could not reallocate Fellow! Check ID and try again"
                  break
+
+    def save_state(self, dbname):
+        pass
