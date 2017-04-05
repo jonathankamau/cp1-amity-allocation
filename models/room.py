@@ -1,9 +1,9 @@
-class Room:
-    """ created the room class """
-    def __init__(self,room_name):
-        """ initializes the roomm class """
-        self.room_name = room_name
+class Room(object):
     
-    def create_room(self, room_name):
-        """ creates room """
-        return "created room successfully"
+    def __init__(self):
+        pass
+
+class Office(Room):
+    max_capacity = 6
+class LivingSpace(Room):
+    max_capacity = 4
