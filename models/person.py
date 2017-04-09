@@ -1,14 +1,25 @@
-from .amity import Amity
 
-class Person(Amity):
-    def __init__(self):
-        pass
-      #  self.fellow_list = []
-      #  self.staff_list = []
+class Person(object):
+    def __init__(self, firstname, lastname, role):
+        self.firstname = firstname
+        self.lastname = lastname
+        self.role = role
+        self.accomodation = ''
 
-        
 class Fellow(Person):
-    pass
-    
+    def __init__(self, firstname, lastname, role, accomodation):
+        super(Fellow, self).__init__(firstname, lastname, role="FELLOW")
+        name = firstname+" "+lastname
+        self.name = name
+        self.office = ''
+        self.accomodation = accomodation
+        self.person_id = id(name)
+
 class Staff(Person):
-    pass
+    def __init__(self, firstname, lastname, role):
+        super(Staff, self).__init__(firstname, lastname, role="STAFF")
+        name = firstname+" "+lastname
+        self.name = name
+        self.office = ''
+        self.person_id = id(name)
+        self.accomodation = ''
