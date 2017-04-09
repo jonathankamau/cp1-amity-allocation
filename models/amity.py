@@ -1,179 +1,263 @@
 import os.path
-import uuid
+import random
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+
+from models.person import Person, Fellow, Staff
+from models.room import Room, Office, LivingSpace
+from models.db.sqlalchemy_declarative import (Base, PersonStore, FellowStore, StaffStore, RoomStore,
+                                              OfficeStore, LSpaceStore, AllocationsStore,
+                                              UnallocatedStore)
+
 class Amity:
-    room_capacity = 6
     def __init__(self):
-        self.office_list = []
-        #office_list = office_list
-        self.living_space_list = []
-        self.all_rooms = []
-        self.living_space_dict = {}
-        self.office_dict = {}
-        self.all_people = []
-        self.fellow_dict = {}
-        self.office_occupied = {}
-        self.living_space_occupied = {}
-        self.staff_dict = {}
-        self.person_room_dict = {}
+        self.office = []
+        self.lspace = []
+        self.fellows = []
+        self.staff = []
         self.loadpeople = "persons.txt"
+        self.unallocated_office = []
+        self.unallocated_lspace = []
 
-    def add_person(self, name, status):
-        """ adds a person """
-        if status == "FELLOW":
-            person_id = "F" + str(hash(str(uuid.uuid1())) % 10000)
-            self.fellow_dict[person_id] = name
-            self.all_people.append(name)
-            return "Fellow Added Successfully"
-        elif status == "STAFF":
-            person_id = "ST" + str(hash(str(uuid.uuid1())) % 10000)
-            self.staff_dict[person_id] = name
-            self.all_people.append(name)
-
-            return "Staff Added Successfully"
-        else:
-            return "Staff Not Added"
-    def create_room(self, **room_name):
+    def create_room(self, roomtype, roomname):
         """ method that creates room"""
-        for roomkeys, roomvalues in room_name.items():
-            if roomvalues == "Office":
-                self.office_dict[roomkeys] = "V"
-                self.all_rooms.append(roomkeys)
-                return "Office created successfully"
-            elif roomvalues == "Living Space":
-                self.living_space_dict[roomkeys] = "V"
-                self.all_rooms.append(roomkeys)
-                return "living space created successfully"
-
-    def allocate_fellow_office(self, name, person_id):
-        """ method to allocate fellow office """
-        for fellowkeys, fellowvalues in self.fellow_dict.items():
-            if fellowvalues == name and fellowkeys == person_id:
-                if self.office_occupied.__contains__(fellowkeys):
-                    return "already allocated office"
+        if roomtype.capitalize() == "Office":
+            all_rooms = self.office + self.lspace
+            names_exist = ["The following offices exist:"]
+            names_created = ["The following offices were created successfully:"]
+            for name in roomname:
+                if  any(offices.room_name == name for offices in all_rooms):
+                    names_exist.append(name)
                 else:
-                    for officekeys, officevalues in self.office_dict.items():
-                        if officevalues == "V":
-                            self.office_occupied[fellowkeys] = officekeys
-                            self.office_dict[officekeys] = "O"
-                            return "Office assigned successfully to %s", name
-
-    def allocate_fellow_livingspace(self, name, person_id):
-        """ method to allocate fellow living space """
-        for fellow_keys, fellow_values in self.fellow_dict.items():
-            if fellow_values == name and fellow_keys == person_id:
-                if self.living_space_occupied.__contains__(fellow_keys):
-                    return "already allocated living space"
+                    self.office.append(Office(name))
+                    names_created.append(name)
+            if len(names_exist) > 1 and len(names_created) == 1:
+                print(' '.join(names_exist))
+            elif len(names_exist) > 1 and len(names_created) > 1:
+                print(' '.join(names_exist))
+                print(' '.join(names_created))
+            else:
+                print(' '.join(names_created))
+        elif roomtype.capitalize() == "Living":
+            all_rooms = self.office + self.lspace
+            names_exist = ["The following living spaces exist:"]
+            names_created = ["The following living spaces were created successfully:"]
+            for name in roomname:
+                if  any(spaces.room_name == name for spaces in self.lspace):
+                    names_exist.append(name)
                 else:
-                    for living_keys, living_values in self.living_space_dict.items():
-                        if living_values == "V":
-                            self.living_space_occupied[fellow_keys] = living_keys
-                            self.living_space_dict[living_keys] = "O"
-                            return "Living Space assigned successfully to " +name
+                    self.lspace.append(LivingSpace(name))
+                    names_created.append(name)
+            if len(names_exist) > 1 and len(names_created) == 1:
+                print(' '.join(names_exist))
+            elif len(names_exist) > 1 and len(names_created) > 1:
+                print(' '.join(names_exist))
+                print(' '.join(names_created))
+            else:
+                print(' '.join(names_created))
+        else:
+            print("Room not created!!")
 
-    def allocate_staff_office(self, name, person_id):
-        """ method to allocate staff an office """
-        for staffkeys, staffvalues in self.staff_dict.items():
-            if staffvalues == name and staffkeys == person_id:
-                if self.office_occupied.__contains__(staffkeys):
-                    return "already allocated office"
+    def add_person(self, firstname, lastname, role, accomodation):
+        """ adds a person """
+        name = firstname+" "+lastname
+        person = self.fellows + self.staff
+        if role == "FELLOW":
+            if any(fellow.name == name for fellow in person):
+                print(name, "already exists!!!")
+            else:
+                newfellow = Fellow(firstname, lastname, role, accomodation)
+                fname = newfellow.name
+                self.fellows.append(newfellow)
+                print("Fellow "+fname+" Added Successfully")
+                if not self.office:
+                    print('No offices available to select from!!')
                 else:
-                    for officekeys, officevalues in self.office_dict.items():
-                        if officevalues == "V":
-                            self.office_occupied[staffkeys] = officekeys
-                            self.office_dict[officekeys] = "O"
-                            return "Office assigned successfully to %s", name
+                    selectoffice = random.choice(self.office)
+                    roomname = selectoffice.room_name
+                    people = selectoffice.allocations
+                    maxcapacity = selectoffice.max_capacity
+                    if any(office.room_name == roomname for office in self.office):
+                        if len(people) < maxcapacity:
+                            selectoffice.allocations.append(newfellow)
+                            print("Fellow "+fname+" assigned office "+roomname)
+                        else:
+                            self.unallocated_office.append(newfellow)
+                            print("Fellow not assigned office!!")
+                if accomodation == "Y":
+                    if not self.lspace:
+                        print('no living spaces to select from!!')
+                    else:
+                        selectspace = random.choice(self.lspace)
+                        spacename = selectspace.room_name
+                        lspeople = selectspace.allocations
+                        lsmaxcapacity = selectspace.max_capacity
+                        if any(space.room_name == spacename for space in self.lspace):
+                            if len(lspeople) < lsmaxcapacity:
+                                selectspace.allocations.append(newfellow)
+                                print("Fellow "+fname+" assigned living space "+spacename)
+                            else:
+                                self.unallocated_lspace.append(newfellow)
+                                print("Fellow not assigned living space!!")
+        elif role == "STAFF":
+            if any(staff.name == name for staff in person):
+                print(name, "already exists")
+            else:
+                newstaff = Staff(firstname, lastname, role)
+                fname = newstaff.name
+                self.fellows.append(newstaff)
+                print("Staff "+fname+" Added Successfully")
+                if not self.office:
+                    print('No offices available to select from!!')
+                else:
+                    selectoffice = random.choice(self.office)
+                    roomname = selectoffice.room_name
+                    people = selectoffice.allocations
+                    maxcapacity = selectoffice.max_capacity
+                    if any(office.room_name == roomname for office in self.office):
+                        if len(people) < maxcapacity:
+                            selectoffice.allocations.append(newstaff)
+                            print("Staff "+fname+" assigned office "+roomname)
+                        else:
+                            self.unallocated_office.append(newstaff)
+                            print("Staff not assigned office!!")
+                if accomodation == "Y":
+                    print("staff cannot be assigned accomodation!!!")
 
     def load_people(self, filename):
         """ method to load people from a file """
-        filename = self.loadpeople
         scriptpath = os.path.dirname(__file__)
-        filetitle = os.path.join(scriptpath, filename)
-        fileopen = open(filetitle)
-        persons = fileopen.read()
-        fileopen.close()
-        return persons
+        filetitle = os.path.join(scriptpath, filename+".txt")
+        #fileopen = open(filetitle)
+        with open(filetitle, 'r') as fileopen:
+            for line in fileopen:
+                #print(line.split())
+                splitwords = line.split()
+                if len(splitwords) < 4:
+                    accomodate = ' '
+                    self.add_person(splitwords[0], splitwords[1], splitwords[2], accomodate)
+                else:
+                    accomodate = splitwords[3]
+                    self.add_person(splitwords[0], splitwords[1], splitwords[2], accomodate)
+                if 'str' in line:
+                    break
 
     def print_room(self, roomname):
         """ method to print persons who have been allocated a room """
-        print(roomname.upper()+"\n")
-        self.fellow_dict.update(self.staff_dict)
-        for keyamity, valueamity in self.fellow_dict.items():
-            for keyoffice, valueoffice in self.office_occupied.items():
-                if str(keyoffice) == str(keyamity) and valueoffice == roomname:
-                    return valueamity+"\n"
+        rooms = self.office + self.lspace
+        for room in rooms:
+            if roomname == room.room_name:
+                print(room.room_name)
+                for allocate in room.allocations:
+                    print(allocate.name)
 
-    def print_allocations(self, filename):
-        """ method to print allocations """
-        self.fellow_dict.update(self.staff_dict)
-        for keyamity, valueamity in self.fellow_dict.items():
-            for keyoffice, valueoffice in self.office_occupied.items():
-                if str(keyoffice) == str(keyamity) and filename == " ":
-                    return valueoffice+"\n ----------\n"+valueamity+"\n"
-                elif str(keyoffice) == str(keyamity) and filename != " ":
-                    scriptpath = os.path.dirname(__file__)
-                    filetitle = os.path.join(scriptpath, filename)
-                    filecontent = valueoffice+"\n ----------\n"+valueamity+"\n"
-                    fileopen = open(filetitle, "w+")
-                    persons = fileopen.write(filecontent)
-                    fileopen.close()
+    def print_allocations(self, printfile):
+        """ method to print list of allocations """
+        rooms = self.office + self.lspace
+        for room in rooms:
+            if len(room.allocations) > 1 and printfile is None:
+                print(room.room_name)
+                for allocate in room.allocations:
+                    print(allocate.name)
+            elif len(room.allocations) > 1 and printfile != None:
+                scriptpath = os.path.dirname(__file__)
+                filetitle = os.path.join(scriptpath, printfile+".txt")
+                fileopen = open(filetitle, "w+")
+                fileroom = room.room_name+"\n"
+                fileopen.write(fileroom)
+                for allocate in room.allocations:
+                    filepeople = allocate.name
+                    fileopen.write(filepeople)
+        fileopen.close()
 
     def print_unallocated(self, filename):
-        if filename == " ":
-            self.fellow_dict.update(self.staff_dict)
-            for keyAmity, valueAmity in self.fellow_dict.items():
-                for keyOffice, valueOffice in self.office_occupied.items():
-                    if str(keyOffice) != str(keyAmity):
-                        return keyAmity+" : "+valueAmity+"\n"
+        for unallocated in self.unallocated_office:
+            scriptpath = os.path.dirname(__file__)
+            filetitle = os.path.join(scriptpath, filename+".txt")
+            fileopen = open(filetitle, "w+")
+            fileroom = "People Unallocated Office Space\n"+unallocated.room_name+"\n"
+            fileopen.write(fileroom)
+            for unallocate in self.unallocated_office:
+                fileoffice = unallocate.name
+                fileopen.write(fileoffice)
+            fileopen.close()
 
-    def reallocate_fellow_office(self, person_id, room_name):
-        """ reallocates fellow office """
-        for x, y in self.fellow_dict.items():
-            if x == person_id and person_id[:1] == "F":
-                for a, b in self.office_dict.items():
-                    if a == room_name:
-                        self.office_occupied[x] = a
-                        if b == "V":
-                            self.office_dict[a] = "O"
-                        return y+" reallocated successfully to "+a
-                        break
-                break
-            else:
-                return "Could not reallocate fellow! Check ID and try again"
-                break
-
-    def reallocate_staff_office(self, person_id, room_name):
-         """ reallocates staff office """
-         for x, y in self.staff_dict.items():
-             if x == person_id and person_id[:1] == "S":
-                 for a, b in self.office_dict.items():
-                     if a == room_name:
-                         self.office_occupied[x]=a
-                         if b == "V":
-                             self.office_dict[a] = "O"
-                     return y+" assigned successfully to "+a
-                     break
-                 break     
-             else:
-                 return "Could not reallocate Staff! Check ID and try again"
-                 break
-    
-    def reallocate_fellow_living_space(self, person_id, room_name):
-     """ reallocates fellow living space """
-     for x, y in self.fellow_dict.items():
-             if x == person_id and person_id[:1] == "F":
-                 for a, b in self.living_space_dict.items():
-                     if a == room_name:
-                         self.living_space_occupied[x]=a
-                         if b == "V":
-                             self.living_space_dict[a] = "O"
-                             
-                         return y+" assigned successfully to "+a
-                         break
-                     break
-             else:
-                 
-                 return "Could not reallocate Fellow! Check ID and try again"
-                 break
-
-    def save_state(self, dbname):
+    def search_for_id(self, name):
         pass
+    def search_for_room(self, name):
+        pass
+
+    def reallocate_person(self, person_identifier, new_room_name):
+        people = self.fellows + self.staff
+        rooms = self.office + self.lspace
+        for person in people:
+            if person_identifier != person.person_id:
+                print("The ID does not exist!! Try again")
+            elif person_identifier == person.person_id and person_identifier.startswith('F', 0, 1):
+                for room in rooms:
+                    for allocate in room.allocations:
+                        if allocate == person:
+                            room.allocations.remove(person)
+                    if room.room_name == new_room_name:
+                        room.allocations.append(person)
+                        print("Fellow has been reallocated successfully")
+            elif person_identifier == person.person_id and person_identifier.startswith('ST', 0, 2):
+                if any(living.room_name == new_room_name for living in self.lspace):
+                    print("Staff cannot be allocated living space!!!")
+                    for room in rooms:
+                        for allocate in room.allocations:
+                            if allocate == person:
+                                room.allocations.remove(person)
+                        if room.room_name == new_room_name:
+                            room.allocations.append(person)
+                            print("Staff has been reallocated successfully")
+
+    def save_state(self, database):
+        engine = create_engine('sqlite:///models/db/'+database+'.db')
+        Base.metadata.create_all(engine)
+        session = Session(bind=engine)
+        rooms = self.office + self.lspace
+        persons = self.fellows + self.staff
+
+        for room in rooms:
+            session.add(RoomStore(room_id=room.room_id, room_name=room.room_name,
+                                  room_type=room.room_type))
+
+        for person in persons:
+            session.add(PersonStore(person_id=person.person_id, first_name=person.firstname,
+                                    last_name=person.lastname, role=person.role,
+                                    accomodation=person.accomodation))
+
+        session.commit()
+
+    def load_state(self, database):
+        engine = create_engine('sqlite:///models/db/'+database+'.db')
+        Base.metadata.bind = engine
+        session = Session(bind=engine)
+
+        roomstore = session.query(RoomStore.room_id, RoomStore.room_name, RoomStore.room_type).all()
+
+        for rooms in roomstore:
+            if rooms.room_type == "Office":
+                office = Office(rooms.room_name)
+                self.office.append(office)
+
+            elif rooms.room_type == "LivingSpace":
+                lspace = LivingSpace(rooms.room_name)
+                self.lspace.append(lspace)
+
+        personstore = session.query(PersonStore.first_name, PersonStore.last_name,
+                                    PersonStore.person_id, PersonStore.role,
+                                    PersonStore.accomodation).all()
+
+        for persons in personstore:
+            if persons.role == "FELLOW":
+                fellow = Fellow(persons.first_name, persons.last_name,
+                                persons.role, persons.accomodation)
+                self.fellows.append(fellow)
+
+            elif persons.role == "STAFF":
+                staff = Staff(persons.first_name, persons.last_name, persons.role)
+                self.staff.append(staff)
+
