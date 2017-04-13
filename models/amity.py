@@ -22,7 +22,7 @@ class Amity:
 
     def create_room(self, roomtype, roomname):
         """ method that creates room"""
-        if roomtype.capitalize() == "Office":
+        if roomtype.upper() == "OFFICE":
             all_rooms = self.office + self.lspace
             names_exist = ["The following offices exist:"]
             names_created = ["The following offices were created successfully:"]
@@ -33,13 +33,14 @@ class Amity:
                     self.office.append(Office(name))
                     names_created.append(name)
             if len(names_exist) > 1 and len(names_created) == 1:
-                print(' '.join(names_exist))
+                returnmsg = ' '.join(names_exist)
             elif len(names_exist) > 1 and len(names_created) > 1:
-                print(' '.join(names_exist))
-                print(' '.join(names_created))
+                returnmsg = ' '.join(names_exist), ' '.join(names_created)
             else:
-                print(' '.join(names_created))
-        elif roomtype.capitalize() == "Living":
+                returnmsg = ' '.join(names_created)
+
+            return returnmsg
+        elif roomtype.upper() == "LIVING":
             all_rooms = self.office + self.lspace
             names_exist = ["The following living spaces exist:"]
             names_created = ["The following living spaces were created successfully:"]
@@ -50,107 +51,140 @@ class Amity:
                     self.lspace.append(LivingSpace(name))
                     names_created.append(name)
             if len(names_exist) > 1 and len(names_created) == 1:
-                print(' '.join(names_exist))
+                returnmsg = ' '.join(names_exist)
             elif len(names_exist) > 1 and len(names_created) > 1:
-                print(' '.join(names_exist))
-                print(' '.join(names_created))
+                returnmsg = ' '.join(names_exist), ' '.join(names_created)
             else:
-                print(' '.join(names_created))
-        else:
-            print("Room not created!!")
+                returnmsg = ' '.join(names_created)
 
-    def add_person(self, firstname, lastname, role, accomodation):
+            return returnmsg
+
+        else:
+            return "Room not created!! check your input format and try again"
+
+    def add_person(self, firstname, lastname, role, accomodation="N"):
         """ adds a person """
         name = firstname+" "+lastname
         person = self.fellows + self.staff
-        if role == "FELLOW":
+        returnmsg = ''
+        if role.upper() == "FELLOW":
             if any(fellow.name == name for fellow in person):
-                print(name, "already exists!!!")
+                returnmsg = name + " already exists!!!"
             else:
                 newfellow = Fellow(firstname, lastname, role, accomodation)
                 fname = newfellow.name
                 self.fellows.append(newfellow)
-                print("Fellow "+fname+" Added Successfully")
-                if not self.office:
-                    print('No offices available to select from!!')
-                else:
-                    selectoffice = random.choice(self.office)
-                    roomname = selectoffice.room_name
-                    people = selectoffice.allocations
-                    maxcapacity = selectoffice.max_capacity
-                    if any(office.room_name == roomname for office in self.office):
-                        if len(people) < maxcapacity:
-                            selectoffice.allocations.append(newfellow)
-                            print("Fellow "+fname+" assigned office "+roomname)
-                        else:
-                            self.unallocated_office.append(newfellow)
-                            print("Fellow not assigned office!!")
-                if accomodation == "Y":
-                    if not self.lspace:
-                        print('no living spaces to select from!!')
-                    else:
-                        selectspace = random.choice(self.lspace)
-                        spacename = selectspace.room_name
-                        lspeople = selectspace.allocations
-                        lsmaxcapacity = selectspace.max_capacity
-                        if any(space.room_name == spacename for space in self.lspace):
-                            if len(lspeople) < lsmaxcapacity:
-                                selectspace.allocations.append(newfellow)
-                                print("Fellow "+fname+" assigned living space "+spacename)
-                            else:
-                                self.unallocated_lspace.append(newfellow)
-                                print("Fellow not assigned living space!!")
-        elif role == "STAFF":
+                returnmsg = "Fellow "+fname+" Added Successfully"
+                #return result
+                allocateoffice = self.allocate_fellow_office(newfellow, fname)
+
+                allocateliving = self.allocate_fellow_livingspace(newfellow, fname, accomodation)
+
+            return "{}\n{}\n{}".format(returnmsg, allocateoffice, allocateliving)
+
+        elif role.upper() == "STAFF":
             if any(staff.name == name for staff in person):
-                print(name, "already exists")
+                returnmsg = name+ " already exists!!"
             else:
                 newstaff = Staff(firstname, lastname, role)
                 fname = newstaff.name
                 self.fellows.append(newstaff)
-                print("Staff "+fname+" Added Successfully")
-                if not self.office:
-                    print('No offices available to select from!!')
+                returnmsg = "Staff "+fname+" Added Successfully"
+                allocate = self.allocate_staff_office(newstaff, fname, accomodation)
+
+            return "{}\n{}".format(returnmsg, allocate)
+
+    def allocate_fellow_office(self, newfellow, fname):
+        if not self.office:
+            returnmsg = 'No offices available to select from!!'
+        else:
+            selectoffice = random.choice(self.office)
+            roomname = selectoffice.room_name
+            people = selectoffice.allocations
+            maxcapacity = selectoffice.max_capacity
+            if any(office.room_name == roomname for office in self.office):
+                if len(people) < maxcapacity:
+                    selectoffice.allocations.append(newfellow)
+                    returnmsg = "Fellow "+fname+" assigned office "+roomname
                 else:
-                    selectoffice = random.choice(self.office)
-                    roomname = selectoffice.room_name
-                    people = selectoffice.allocations
-                    maxcapacity = selectoffice.max_capacity
-                    if any(office.room_name == roomname for office in self.office):
-                        if len(people) < maxcapacity:
-                            selectoffice.allocations.append(newstaff)
-                            print("Staff "+fname+" assigned office "+roomname)
-                        else:
-                            self.unallocated_office.append(newstaff)
-                            print("Staff not assigned office!!")
-                if accomodation == "Y":
-                    print("staff cannot be assigned accomodation!!!")
+                    self.unallocated_office.append(newfellow)
+                    returnmsg = "Fellow not assigned office!!"
+
+            return returnmsg
+
+    def allocate_staff_office(self, newstaff, fname, accomodation):
+        if not self.office:
+            returnmsg = 'No offices available to select from!!'
+        else:
+            selectoffice = random.choice(self.office)
+            roomname = selectoffice.room_name
+            people = selectoffice.allocations
+            maxcapacity = selectoffice.max_capacity
+            if any(office.room_name == roomname for office in self.office):
+                if len(people) < maxcapacity:
+                    selectoffice.allocations.append(newstaff)
+                    returnmsg = "Staff "+fname+" assigned office "+roomname
+                else:
+                    self.unallocated_office.append(newstaff)
+                    returnmsg = "Staff not assigned office!!"
+        if accomodation == "Y":
+            returnmsg = "staff cannot be assigned accomodation!!!"
+
+        return returnmsg
+
+    def allocate_fellow_livingspace(self, newfellow, fname, accomodation):
+        if accomodation == "Y":
+            if not self.lspace:
+                return 'no living spaces to select from!!'
+            else:
+                selectspace = random.choice(self.lspace)
+                spacename = selectspace.room_name
+                lspeople = selectspace.allocations
+                lsmaxcapacity = selectspace.max_capacity
+                if any(space.room_name == spacename for space in self.lspace):
+                    if len(lspeople) < lsmaxcapacity:
+                        selectspace.allocations.append(newfellow)
+                        return "Fellow "+fname+" assigned living space "+spacename
+                    else:
+                        self.unallocated_lspace.append(newfellow)
+                        return "Fellow not assigned living space!!"
 
     def load_people(self, filename):
         """ method to load people from a file """
+        return_three = []
+        return_four = []
         scriptpath = os.path.dirname(__file__)
-        filetitle = os.path.join(scriptpath, filename+".txt")
-        #fileopen = open(filetitle)
-        with open(filetitle, 'r') as fileopen:
-            for line in fileopen:
-                #print(line.split())
-                splitwords = line.split()
-                if len(splitwords) < 4:
-                    accomodate = ' '
-                    self.add_person(splitwords[0], splitwords[1], splitwords[2], accomodate)
-                else:
-                    accomodate = splitwords[3]
-                    self.add_person(splitwords[0], splitwords[1], splitwords[2], accomodate)
-                if 'str' in line:
-                    break
+        filetitle = os.path.join(scriptpath, "../textfiles/"+filename+".txt")
+        try:
+            with open(filetitle, 'r') as fileopen:
+                for line in fileopen:
+                    splitwords = line.split()
+                    if len(splitwords) < 4:
+                        accomodate = ' '
+                        return_three.append(self.add_person(splitwords[0], splitwords[1],
+                                                            splitwords[2], accomodate))
+                    elif len(splitwords) == 4:
+                        accomodate = splitwords[3]
+                        return_four.append(self.add_person(splitwords[0], splitwords[1],
+                                                           splitwords[2], accomodate))
+                        if 'str' in line:
+                            break
+        except FileNotFoundError:
+            return_three.append("Unable to open file! Please check if file exists"+
+                                " and if the file name is correct then try again")
+
+        return "{}\n{}".format('\n'.join(return_three), '\n'.join(return_four))
 
     def print_room(self, roomname):
         """ method to print persons who have been allocated a room """
         rooms = self.office + self.lspace
         for room in rooms:
             if roomname == room.room_name:
-                print(room.room_name)
+                returnmsg = room.room_name
                 for allocate in room.allocations:
-                    print(allocate.name)
+                    message = allocate.name
+
+        return "{}\n{}".format(returnmsg, message)
 
     def print_allocations(self, printfile):
         """ method to print list of allocations """
@@ -169,9 +203,10 @@ class Amity:
                 for allocate in room.allocations:
                     filepeople = allocate.name
                     fileopen.write(filepeople)
-        fileopen.close()
+                    fileopen.close()
 
     def print_unallocated(self, filename):
+        """ method to print list of unallocated people """
         for unallocated in self.unallocated_office:
             scriptpath = os.path.dirname(__file__)
             filetitle = os.path.join(scriptpath, filename+".txt")
@@ -189,31 +224,50 @@ class Amity:
         pass
 
     def reallocate_person(self, person_identifier, new_room_name):
+        """ method to reallocate person to a new room """
+        people = self.fellows + self.staff
+        rooms = self.office + self.lspace
+        #if any(person.name == person_identifier for person in people):
+        if person_identifier not in [person.name for person in people]:
+            returnmsg = "The name or ID does not exist!! Try again"
+        else:
+            for person, room, allocate in zip(people, rooms, room.allocations):
+                if person.name == person_identifier and allocate == person:
+                    room.allocations.remove(person)
+                if (room.room_name == new_room_name and
+                        len(room.allocations) < room.max_capacity):
+                    room.allocations.append(person)
+                    returnmsg = "{} has been reallocated successfully".format(person.name)
+
+                else:
+                    returnmsg = "Could not reallocate {} to room {}!".format(person.name, new_room_name)
+
+        return returnmsg
+
+    def reallocated_person(self, person_identifier, new_room_name):
+        """ method to reallocate person to a new room """
         people = self.fellows + self.staff
         rooms = self.office + self.lspace
         for person in people:
-            if person_identifier != person.person_id:
-                print("The ID does not exist!! Try again")
-            elif person_identifier == person.person_id and person_identifier.startswith('F', 0, 1):
+            if person.name == person_identifier:
                 for room in rooms:
                     for allocate in room.allocations:
                         if allocate == person:
                             room.allocations.remove(person)
-                    if room.room_name == new_room_name:
+                    if (room.room_name == new_room_name and
+                            len(room.allocations) < room.max_capacity):
                         room.allocations.append(person)
-                        print("Fellow has been reallocated successfully")
-            elif person_identifier == person.person_id and person_identifier.startswith('ST', 0, 2):
-                if any(living.room_name == new_room_name for living in self.lspace):
-                    print("Staff cannot be allocated living space!!!")
-                    for room in rooms:
-                        for allocate in room.allocations:
-                            if allocate == person:
-                                room.allocations.remove(person)
-                        if room.room_name == new_room_name:
-                            room.allocations.append(person)
-                            print("Staff has been reallocated successfully")
+                        returnmsg = "{} has been reallocated successfully".format(person.name)
+                    else:
+                        returnmsg = "Could not reallocate {} to room {}!".format(person.name, new_room_name)
+            else:
+                returnmsg = "The name or ID does not exist!! Try again"
+
+
+        return returnmsg
 
     def save_state(self, database):
+        """ method to save data to the database """
         engine = create_engine('sqlite:///models/db/'+database+'.db')
         Base.metadata.create_all(engine)
         session = Session(bind=engine)
@@ -232,6 +286,7 @@ class Amity:
         session.commit()
 
     def load_state(self, database):
+        """ method to load data from the database """
         engine = create_engine('sqlite:///models/db/'+database+'.db')
         Base.metadata.bind = engine
         session = Session(bind=engine)
