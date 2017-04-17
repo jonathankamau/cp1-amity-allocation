@@ -3,8 +3,10 @@ class Person(object):
     def __init__(self, firstname, lastname, role):
         self.firstname = firstname
         self.lastname = lastname
+        self.name = "{} {}".format(self.firstname, self.lastname)
         self.role = role
         self.accomodation = ''
+        self.person_id = 0
 
 class Fellow(Person):
     def __init__(self, firstname, lastname, role, accomodation):
@@ -12,8 +14,9 @@ class Fellow(Person):
         name = "{} {}".format(firstname, lastname)
         self.name = name
         self.office = ''
+        self.living = ''
         self.accomodation = accomodation
-        self.person_id = id(name)
+        self.person_id = 0
 
 class Staff(Person):
     def __init__(self, firstname, lastname, role):
@@ -21,5 +24,5 @@ class Staff(Person):
         name = "{} {}".format(firstname, lastname)
         self.name = name
         self.office = ''
-        self.person_id = id(name)
+        self.person_id = 0
         self.accomodation = ''
