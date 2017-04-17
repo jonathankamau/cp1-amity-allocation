@@ -3,6 +3,7 @@ class Room(object):
         self.room_name = room_name
         self.room_type = room_type
         self.max_capacity = max_capacity
+        self.allocations = []
 
 class Office(Room):
     def __init__(self, room_name):
