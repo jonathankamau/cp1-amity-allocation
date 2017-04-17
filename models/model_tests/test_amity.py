@@ -1,5 +1,9 @@
 import unittest
+import sys
 import os
+from contextlib import contextmanager
+from io import StringIO
+
 from models.room import Room, Office, LivingSpace
 from models.amity import Amity
 from models.person import Person, Fellow, Staff
@@ -15,6 +19,23 @@ class AmityTest(unittest.TestCase):
         self.staff = Staff
         self.amity = Amity()
         self.testperson = "Jon"
+
+    @contextmanager
+
+    def captured_output(self):
+        """
+        method is used to capture the output of print() statements from other methods
+        for purposes of testing with assert statements it does this by temporarily substituting
+        in built stdout and stderr with instances of StringIO class
+        """
+
+        new_out, new_err = StringIO(), StringIO()
+        old_out, old_err = sys.stdout, sys.stderr
+        try:
+            sys.stdout, sys.stderr = new_out, new_err
+            yield sys.stdout, sys.stderr
+        finally:
+            sys.stdout, sys.stderr = old_out, old_err
 
     def test_living_space_inheritance(self):
         """ Tests if living space class inherits from room class """
@@ -99,29 +120,31 @@ class AmityTest(unittest.TestCase):
         name = "John Mark"
         self.amity.create_room("office", roomname)
         self.amity.add_person("John", "Mark", "fellow", "N")
+        for fellow in self.amity.fellows:
+            if fellow.name == name:
+                fellowid = fellow.person_id
         message = "has been reallocated successfully"
-        returnmsg = self.amity.reallocate_person(name, "embu")
+        returnmsg = self.amity.reallocate_person(fellowid, "embu")
         self.assertIn(message, returnmsg, msg="Not reallocated")
 
-    def test_print_allocations(self):
+    def test_prints_allocations(self):
         """ tests if it prints room allocations """
-        fname = "allocate.txt"
-        self.amity.print_allocations(fname)
-        scriptpath = os.path.dirname(__file__)
-        filetitle = os.path.join(scriptpath, fname)
-        fileopen = open(filetitle)
-        persons = fileopen.read()
-        self.assertIn('Hogwarts', persons, msg="Not found!")
+        roomname = ['meru', 'embu']
+        self.amity.create_room("office", roomname)
+        self.amity.add_person("John", "Mark", "fellow", "N")
+        #message = "The list of allocations has been saved to"
+        with self.captured_output() as (out, err):
+            self.amity.print_allocations('')
+            output = out.getvalue()
+        self.assertIn(output, "", msg="allocations not printed to screen!")
+        #returnmsg = self.amity.print_allocations({"--o":"testfile"})
+        #self.assertIn(message, returnmsg, msg="allocations not printed to screen!")
 
     def test_print_unallocated(self):
         """ tests if it prints unallocated staff and fellows """
-        fname = "unallocated.txt"
-        self.amity.print_allocations(fname)
-        scriptpath = os.path.dirname(__file__)
-        filetitle = os.path.join(scriptpath, fname)
-        fileopen = open(filetitle)
-        persons = fileopen.read()
-        self.assertIn('Alex', persons, msg="Not found!")
+        returnmsg = self.amity.print_unallocated({"--o":"testfile"})
+        message = "Here is the list of people unallocated"
+        self.assertIn(message, returnmsg, msg="Not found!")
 
     def test_prints_room(self):
         """ tests if it prints list of people in a room """
@@ -174,12 +197,11 @@ class AmityTest(unittest.TestCase):
 
     def tearDown(self):
         """ free up resources """
-        del self.room
-        del self.office
-        del self.livingspace
-        del self.person
-        del self.fellow
-        del self.staff
+        self.office = []
+        self.livingspace = []
+        self.person = []
+        self.fellow = []
+        self.staff = []
         del self.amity
         del self.testperson
 
