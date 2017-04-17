@@ -1,6 +1,5 @@
 language: python
 python:
-  - "2.7"
   - "3.6"
 install:
     - pip install -r requirements.txt
@@ -11,6 +10,6 @@ env:
 addons:
   
 script:
-  - coverage run --omit=*/tests/* --source= nosetests --with-coverage
+  - coverage run --omit=*/tests/* test_* *sqlalchemy/* *models/db/sqlalchemy_declarative.py *decimal.py *numbers.py --source= nosetests --with-coverage
 after_success: coveralls
 cache: pip
