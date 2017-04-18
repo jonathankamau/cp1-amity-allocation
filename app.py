@@ -10,6 +10,9 @@ Usage:
     Amity print_room <room_name>
     Amity save_state [--db=sqlite_database]
     Amity load_state <sqlite_database>
+    Amity print_all_people
+    Amity print_all_rooms
+    Amity delete_person <personid>
     Amity (-i | --interactive)
     Amity (-h | --help | --version)
 Options:
@@ -173,7 +176,7 @@ class AmityApp (cmd.Cmd):
     def do_load_state(self, args):
         """Usage: load_state <database>"""
 
-        self.amity.load_state(args['<database>'])
+        print(self.amity.load_state(args['<database>']))
 
     def do_quit(self, args):
         """Quits out of Interactive Mode."""
