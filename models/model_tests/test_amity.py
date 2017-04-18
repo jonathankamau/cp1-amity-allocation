@@ -4,9 +4,12 @@ import os
 from contextlib import contextmanager
 from io import StringIO
 
+
 from models.room import Room, Office, LivingSpace
 from models.amity import Amity
 from models.person import Person, Fellow, Staff
+import models.db.sqlalchemy_declarative
+
 
 class AmityTest(unittest.TestCase):
     """ initializes the test class """
@@ -82,11 +85,13 @@ class AmityTest(unittest.TestCase):
 
     def test_fellow_allocated_office(self):
         """ tests if fellow has been allocated office """
+        roomname = ['meru', 'embu']
+        self.amity.create_room("office", roomname)
         firstname = "James"
         lastname = "Mwangi"
         role = "Fellow"
         accomodation = 'Y'
-        returnmsg = "Fellow {} {} Added Successfully".format(firstname, lastname)
+        returnmsg = "Fellow {} {} assigned office".format(firstname, lastname)
         add_fellow = self.amity.add_person(firstname, lastname, role, accomodation)
         self.assertIn(returnmsg, add_fellow, msg="Fellow not added!!")
 
@@ -127,72 +132,106 @@ class AmityTest(unittest.TestCase):
         returnmsg = self.amity.reallocate_person(fellowid, "embu")
         self.assertIn(message, returnmsg, msg="Not reallocated")
 
-    def test_prints_allocations(self):
-        """ tests if it prints room allocations """
+    def test_prints_allocations_tofile(self):
+        """ tests if it prints room allocations to file """
         roomname = ['meru', 'embu']
         self.amity.create_room("office", roomname)
         self.amity.add_person("John", "Mark", "fellow", "N")
-        #message = "The list of allocations has been saved to"
         with self.captured_output() as (out, err):
-            self.amity.print_allocations('')
+            self.amity.print_allocations({"--o":"testfile"})
             output = out.getvalue()
-        self.assertIn(output, "", msg="allocations not printed to screen!")
-        #returnmsg = self.amity.print_allocations({"--o":"testfile"})
-        #self.assertIn(message, returnmsg, msg="allocations not printed to screen!")
+        self.assertIn("list of allocations has been saved",
+                      output, msg="allocations not printed to file!")
 
-    def test_print_unallocated(self):
+    def test_prints_allocations_screen(self):
+        """ tests if it prints room allocations to screen """
+        roomname = ['meru', 'embu']
+        self.amity.create_room("office", roomname)
+        self.amity.add_person("John", "Mark", "fellow", "N")
+        with self.captured_output() as (out, err):
+            self.amity.print_allocations({'--o':''})
+            output = out.getvalue()
+        self.assertIn("Name:",
+                      output, msg="allocations not printed to screen!")
+
+    def test_print_unallocated_toscreen(self):
         """ tests if it prints unallocated staff and fellows """
-        returnmsg = self.amity.print_unallocated({"--o":"testfile"})
-        message = "Here is the list of people unallocated"
-        self.assertIn(message, returnmsg, msg="Not found!")
+        self.amity.add_person("John", "Mark", "fellow", "Y")
+        with self.captured_output() as (out, err):
+            self.amity.print_unallocated({"--o":""})
+            output = out.getvalue()
+        message = "Here is the list of people not allocated"
+        self.assertIn(message, output, msg="unallocated people not printed to screen!")
+
+    def test_print_unallocated_tofile(self):
+        """ tests if it prints unallocated staff and fellows """
+        self.amity.add_person("John", "Mark", "fellow", "Y")
+        with self.captured_output() as (out, err):
+            self.amity.print_unallocated({"--o":"unallocated"})
+            output = out.getvalue()
+        message = "list of unallocated persons has been saved to"
+        self.assertIn(message, output, msg="unallocated people not printed to file!")
 
     def test_prints_room(self):
         """ tests if it prints list of people in a room """
-        roomname = "Valhalla"
-        self.assertIn(self.amity.print_room(roomname), "Alex", msg="Could not find person!")
+        room_name = ['meru', 'embu', 'valhalla']
+        self.amity.create_room("office", room_name)
+        self.amity.add_person("John", "Mark", "fellow", "Y")
+        roomname = "valhalla"
+        self.assertIn("Room: VALHALLA", self.amity.print_room(roomname),
+                      msg="Could not print room!")
 
-    def test_add_person_isstring(self):
-        """ test if output for add person method is a string """
-        self.assertIsInstance(self.amity.add_person("Ben", "FELLO"), str, msg="Is not string")
+    def test_print_all_people(self):
+        """ tests if a person list was printed """
+        room_name = ['meru', 'embu', 'valhalla']
+        self.amity.create_room("office", room_name)
+        self.amity.add_person("John", "Mark", "fellow", "Y")
+        with self.captured_output() as (out, err):
+            self.amity.print_all_people({'':''})
+            output = out.getvalue()
+        self.assertIn("Persons List", output, msg="people not printed to file!")
 
-    def test_create_room_isstring(self):
-        """ tests if output for create room method is a string """
-        self.assertIsInstance(self.amity.create_room("Voi", "Living Space"), list, msg="Is not string")
+    def test_print_all_rooms(self):
+        """ tests if a room list was printed """
+        room_name = ['meru', 'embu', 'valhalla']
+        self.amity.create_room("office", room_name)
+        self.amity.add_person("John", "Mark", "fellow", "Y")
+        with self.captured_output() as (out, err):
+            self.amity.print_all_rooms({'':''})
+            output = out.getvalue()
+        self.assertIn("Rooms List", output, msg="people not printed to file!")
 
-    def test_allocate_fellow_office_str(self):
-        """ tests if output for allocate fellow office method is a string """
-        fellowoffice = self.amity.allocate_fellow_office("Alex", "F002")
-        self.assertIsInstance(fellowoffice, str,msg="Is not string")
+    def test_delete_person(self):
+        """test if person was successfully deleted """
+        room_name = ['meru', 'embu', 'valhalla']
+        self.amity.create_room("office", room_name)
+        firstname = "John"
+        lastname = "Mark"
+        name = "{} {}".format(firstname, lastname)
+        self.amity.add_person(firstname, lastname, "fellow", "Y")
+        people = self.amity.fellows + self.amity.staff
+        for fellow in self.amity.fellows:
+            if fellow.name == name:
+                fellow_id = fellow.person_id
 
-    def test_allocate_fellow_ls_for_str(self):
-        """" tests if output for allocate fellow living space method is a string """
-        fellowliving = self.amity.allocate_fellow_livingspace("Alex", "F002")
-        self.assertIsInstance(fellowliving, str,msg="Is not string")
+        returnmsg = self.amity.delete_person(fellow_id)
+        self.assertIn("deleted successfully", returnmsg, msg="Person was not deleted!")
 
-    def test_allocate_staff_office_str(self):
-        """ tests if output for allocate staff office is a string """
-        staf_office = self.amity.allocate_staff_office("Hellen", "ST002")
-        self.assertIsInstance(staf_office, str,msg="Is not string")
+    def test_save_state(self):
+        """Tests if data has been stored in db"""
+        room_name = ['meru', 'embu', 'valhalla']
+        self.amity.create_room("office", room_name)
+        self.amity.add_person("John", "Mark", "fellow", "Y")
+        returnmsg = self.amity.save_state({'--db':'tester'})
+        self.assertIn("Data stored successfully in database",
+                      returnmsg, msg="Could not store to database!")
 
-    def test_reallocate_fellow_off_str(self):
-        """ tests if reallocate_fellow_office method returns a string """
-        fel = self.amity.reallocate_fellow_office("F012", "Valhalla")
-        self.assertIsInstance(fel, str, msg="Is not string")
-
-    def test_reallocate_staff_off_isstr(self):
-        """ tests if reallocate_staff_office method returns a string """
-        fel = self.amity.reallocate_staff_office("ST012", "Valhalla")
-        self.assertIsInstance(fel, str, msg="Is not string")
-
-    def test_reallocate_fellow_ls_isstr(self):
-        """ tests if reallocate_fellow_living_space returns a string """
-        fel = self.amity.reallocate_fellow_living_space("ST012", "Valhalla")
-        self.assertIsInstance(fel, str,msg="Is not string")
-
-    def test_creates_db(self):
-        "Tests if a db is created successfully"
-        self.amity.save_state('amitydb')
-        self.assertTrue(os.path.isfile('amitydb.sqlite'))
+    def test_load_state(self):
+        """ tests if data has been loaded from db """
+        database = "monthly"
+        returnmsg = self.amity.load_state(database)
+        self.assertIn("Data loaded successfully from database",
+                      returnmsg, msg="Could not load from database!")
 
 
     def tearDown(self):
