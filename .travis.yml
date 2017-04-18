@@ -3,13 +3,14 @@ python:
   - "3.6"
 install:
     - pip install -r requirements.txt
-    - pip install braintree coveralls mock mysqlclient
 env:
   - DB=sqlite
   
 addons:
   
 script:
-  - coverage run --omit=*/tests/* test_* *sqlalchemy/* *models/db/sqlalchemy_declarative.py *decimal.py *numbers.py --source = nosetests --with -coverage
-after_success: coveralls
+  - coverage run --omit=*/tests/* test_* *sqlalchemy/* *models/db/sqlalchemy_declarative.py *decimal.py *numbers.py 
+  - coverage run nosetests --with -coverage
+  
+  
 cache: pip
