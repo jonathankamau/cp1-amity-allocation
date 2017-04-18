@@ -95,13 +95,15 @@ class AmityApp (cmd.Cmd):
     @docopt_cmd
     def do_add_person(self, args):
         """Usage: add_person <firstname> <lastname> <role> [<accomodation>]"""
+        if args['<accomodation>'] is None:
+            args['<accomodation>'] = "N"
         if not re.match("^[A-Za-z]*$", args['<firstname>']):
             print(colored("Invalid input! Please enter firstname in string format", "red"))
         elif not re.match("^[A-Za-z]*$", args['<lastname>']):
             print(colored("Invalid input! Please enter lastname in string format", "red"))
         elif not re.match("^[A-Za-z]*$", args['<role>']):
             print(colored("Invalid input! Please enter role in string format", "red"))
-        elif not re.match("^[A-Za-z]*$", args['<accomodation>']):
+        elif not re.match("^[YN' 'yn]*$", args['<accomodation>']):
             print(colored("Invalid input! Please enter accomodation in string format", "red"))
         else:
             print(self.amity.add_person(args['<firstname>'], args['<lastname>'],
