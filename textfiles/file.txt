@@ -1,0 +1,17 @@
+
+ NAIROBI - Office
+ --------------------------------------------------
+ [32mName: Oluwafemi Sule ID: 4467847664, [0m [32mName: Dominic Walters ID: 4467924272, [0m [32mName: Tana Lopez ID: 4467923696, [0m 
+ 
+ MOMBASA - Office
+ --------------------------------------------------
+ [32mName: Simon Patterson ID: 4467924080, [0m [32mName: Mari Lawrence ID: 4467924656, [0m [32mName: Leigh Riley ID: 4467923312, [0m [32mName: Kelly Mcguire ID: 4467924016, [0m 
+ 
+ MERU - LivingSpace
+ --------------------------------------------------
+ [32mName: Oluwafemi Sule ID: 4467847664, [0m [32mName: Simon Patterson ID: 4467924080, [0m [32mName: Mari Lawrence ID: 4467924656, [0m 
+ 
+ EMBU - LivingSpace
+ --------------------------------------------------
+ [32mName: Tana Lopez ID: 4467923696, [0m 
+

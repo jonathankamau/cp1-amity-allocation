@@ -18,9 +18,7 @@ Options:
     -h, --help  Show this screen and exit.
 """
 
-import sys
 import cmd
-import os
 import re
 
 from docopt import docopt, DocoptExit

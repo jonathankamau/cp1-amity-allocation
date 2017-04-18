@@ -1,6 +1,8 @@
+"""
+Tests for amity
+"""
 import unittest
 import sys
-import os
 from contextlib import contextmanager
 from io import StringIO
 
@@ -21,7 +23,6 @@ class AmityTest(unittest.TestCase):
         self.fellow = Fellow
         self.staff = Staff
         self.amity = Amity()
-        self.testperson = "Jon"
 
     @contextmanager
 
@@ -209,7 +210,6 @@ class AmityTest(unittest.TestCase):
         lastname = "Mark"
         name = "{} {}".format(firstname, lastname)
         self.amity.add_person(firstname, lastname, "fellow", "Y")
-        people = self.amity.fellows + self.amity.staff
         for fellow in self.amity.fellows:
             if fellow.name == name:
                 fellow_id = fellow.person_id
@@ -242,7 +242,6 @@ class AmityTest(unittest.TestCase):
         self.fellow = []
         self.staff = []
         del self.amity
-        del self.testperson
 
 
 if __name__ == '__main__':

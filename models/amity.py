@@ -1,3 +1,7 @@
+"""
+This file contains all the methods in the amity application which are contained in class Amity
+
+"""
 import os.path
 import random
 import re
@@ -13,6 +17,7 @@ from models.db.sqlalchemy_declarative import (Base, PersonStore, FellowStore, St
                                               UnallocatedStore)
 
 class Amity:
+    """ This class holds all the methods for amity """
     def __init__(self):
         self.office = []
         self.lspace = []
@@ -203,15 +208,20 @@ class Amity:
 
     def print_room(self, roomname):
         """ method to print persons who have been allocated a room """
-        message = ''
+        # message = ''
+        # returnmsg = ''
+        printroom = []
+        roomname = roomname.upper()
         rooms = self.office + self.lspace
         for room in rooms:
-            if roomname == room.room_name:
-                returnmsg = room.room_name
+            if roomname == room.room_name.upper():
+                printroom.append(" Room: {}\n".format(room.room_name.upper()))
+                printroom.append("-" *50 + "\n")
                 for allocate in room.allocations:
-                    message = allocate.name
+                    printroom.append(" Name: {}, ID: {}\n"
+                                     .format(allocate.name.title(), allocate.person_id))
 
-        return colored("{}\n{}".format(returnmsg, message), "green")
+        return colored(' '.join(printroom), "green", "on_blue", attrs=['bold'])
 
     def print_allocations(self, args):
         """ method to print list of allocations """
@@ -428,10 +438,6 @@ class Amity:
                 print(colored("Name: {}, ID: {}".format(room.room_id, room.room_name),
                               "green", "on_blue", attrs=['bold']))
 
-    def delete_room(self, roomid):
-        """ deletes a room from the system """
-        rooms = self.office + self.lspace
-
     def save_state(self, args):
         """ method to save data to the database """
         if args["--db"]:
@@ -584,7 +590,9 @@ class Amity:
                 staff_unallocated.person_id = unallocated.person_id
                 if unallocated.room_type == "Office":
                     self.unallocated_office.append(staff_unallocated)
-
+        dbpath = os.path.dirname(__file__)
+        dbname = os.path.join(dbpath, 'db/'+database+'.db')
+        os.remove(dbname)
         session.close()
         print(colored("Data loaded successfully from database"+
                       " with the name: {}".format(database), "green"))
