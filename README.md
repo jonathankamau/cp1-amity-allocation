@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/475f95a67aea4b2a9cef2d901d9b7e7d)](https://www.codacy.com/app/jonathankamau/cp1-amity-allocation?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jonathankamau/cp1-amity-allocation&amp;utm_campaign=Badge_Grade)
 # cp1-amity-allocation
 
 DESCRIPTION 
@@ -59,7 +60,6 @@ These are instructions for setting up Amity app in development environment.
 
       $ python app.py
       
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/475f95a67aea4b2a9cef2d901d9b7e7d)](https://www.codacy.com/app/jonathankamau/cp1-amity-allocation?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jonathankamau/cp1-amity-allocation&amp;utm_campaign=Badge_Grade)
 
 
 
