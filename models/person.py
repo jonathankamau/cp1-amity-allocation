@@ -10,6 +10,8 @@ class Person(object):
         self.role = role
         self.accomodation = ''
         self.person_id = 0
+        self.office = ''
+        self.living = ''
 
 class Fellow(Person):
     """ Class that holds properties for Fellow object """
