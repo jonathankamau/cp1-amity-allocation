@@ -35,10 +35,10 @@ class Amity:
             names_created = ["The following offices were created successfully:"]
             for name in roomname:
                 if  any(offices.room_name == name for offices in all_rooms):
-                    names_exist.append(name)
+                    names_exist.append(name.title())
                 else:
-                    self.office.append(Office(name))
-                    names_created.append(name)
+                    self.office.append(Office(name.title()))
+                    names_created.append(name.title())
             if len(names_exist) > 1 and len(names_created) == 1:
                 returnmsg = colored(' '.join(names_exist), "red")
             elif len(names_exist) > 1 and len(names_created) > 1:
@@ -54,10 +54,10 @@ class Amity:
             names_created = ["The following living spaces were created successfully:"]
             for name in roomname:
                 if  any(spaces.room_name == name for spaces in self.lspace):
-                    names_exist.append(name)
+                    names_exist.append(name.title())
                 else:
-                    self.lspace.append(LivingSpace(name))
-                    names_created.append(name)
+                    self.lspace.append(LivingSpace(name.title()))
+                    names_created.append(name.title())
             if len(names_exist) > 1 and len(names_created) == 1:
                 returnmsg = colored(' '.join(names_exist), "red")
             elif len(names_exist) > 1 and len(names_created) > 1:
@@ -74,7 +74,7 @@ class Amity:
 
     def add_person(self, firstname, lastname, role, accomodation="N"):
         """ adds a person """
-        name = firstname+" "+lastname
+        name = firstname.title()+" "+lastname.title()
         person = self.fellows + self.staff
         returnmsg = ''
         allocateoffice = ''
@@ -84,7 +84,7 @@ class Amity:
             if any(fellow.name == name for fellow in person):
                 returnmsg = colored(name + " already exists!!!", "red")
             else:
-                newfellow = Fellow(firstname, lastname, role, accomodation)
+                newfellow = Fellow(firstname.title(), lastname.title(), role, accomodation)
                 fname = newfellow.name
                 newfellow.person_id = id(newfellow.name)
                 self.fellows.append(newfellow)
@@ -103,7 +103,7 @@ class Amity:
             if any(staff.name == name for staff in person):
                 returnmsg = colored(name+ " already exists!!", "red")
             else:
-                newstaff = Staff(firstname, lastname, role)
+                newstaff = Staff(firstname.title(), lastname.title(), role)
                 fname = newstaff.name
                 newstaff.person_id = id(newstaff.name)
                 self.staff.append(newstaff)
@@ -118,6 +118,7 @@ class Amity:
                 return "{}\n{}".format(returnmsg, allocate)
 
     def allocate_fellow_office(self, newfellow, fname):
+        """ method to allocate a fellow an office """
         if not self.office:
             returnmsg = colored('No offices available to select from!!', "red")
             self.unallocated_office.append(newfellow)
@@ -138,6 +139,7 @@ class Amity:
         return returnmsg
 
     def allocate_staff_office(self, newstaff, fname, accomodation):
+        """ method to allocate staff an office """
         if not self.office:
             returnmsg = colored('No offices available to select from!!', 'red')
             self.unallocated_office.append(newstaff)
@@ -153,13 +155,14 @@ class Amity:
                     returnmsg = colored("Staff "+fname+" assigned office "+roomname, "green")
                 else:
                     self.unallocated_office.append(newstaff)
-                    returnmsg = colored("Staff not assigned office!!","red")
+                    returnmsg = colored("Staff not assigned office!!", "red")
         if accomodation == "Y":
             returnmsg = colored("staff cannot be assigned accomodation!!!", "red")
 
         return returnmsg
 
     def allocate_fellow_livingspace(self, newfellow, fname, accomodation):
+        """ method to allocate fellow a living space """
         returnmsg = ''
         if accomodation == "Y":
             if not self.lspace:
@@ -174,7 +177,8 @@ class Amity:
                     if len(lspeople) < lsmaxcapacity:
                         newfellow.living = spacename
                         selectspace.allocations.append(newfellow)
-                        returnmsg = colored("Fellow "+fname+" assigned living space "+spacename, "green")
+                        returnmsg = colored("Fellow "+fname+
+                                            "assigned living space "+spacename, "green")
                     else:
                         self.unallocated_lspace.append(newfellow)
                         returnmsg = colored("Fellow not assigned living space!!", "red")
@@ -333,6 +337,7 @@ class Amity:
         persons = self.fellows + self.staff
         rooms = self.office + self.lspace
         returnmsg = ''
+        new_room_name = new_room_name.title()
         personid = [person.person_id for person in persons]
         person_identifier = int(person_identifier)
         if person_identifier not in personid:
@@ -342,18 +347,31 @@ class Amity:
                 if person.person_id == person_identifier:
                     person_object = person
             for room in rooms:
-                allocatedroom = [allocate.person_id for allocate in room.allocations]
-                if person_object.person_id in allocatedroom:
-                    if new_room_name == room.room_name:
-                        returnmsg = ("{} already is in room {}"
-                                     .format(person_object.name, new_room_name))
-                    else:
-                        room.allocations.remove(person_object)
                 if room.room_name.upper() == new_room_name.upper():
-                    room_object = room
-                    room_object.allocations.append(person_object)
-                    returnmsg = ("{} has been reallocated successfully to room {}"
-                                 .format(person_object.name, room_object.room_name))
+                    if person_object in room.allocations:
+                        returnmsg = (colored("{} already exists in room {}"
+                                             .format(person_object.name, room.room_name), "red"))
+                    elif len(room.allocations) == room.max_capacity:
+                        returnmsg = (colored("Cannot reallocate {} to {}!"
+                                             " Room is at full capacity."
+                                             "Please try another room"
+                                             .format(person_object.name,
+                                                     new_room_name), "red"))
+                    elif person_object not in room.allocations:
+                        given_room = []
+                        given_office = person_object.office
+                        given_lspace = person_object.living
+                        given_room.append(given_office)
+                        given_room.append(given_lspace)
+                        for room in rooms:
+                            if room.room_name.title() in given_room:
+                                room.allocations.remove(person_object)
+                        room.allocations.append(person_object)
+                        returnmsg = (colored("{} has been reallocated"
+                                             " successfully to room {}"
+                                             .format(person_object.name,
+                                                     room.room_name), "green"))
+
         return returnmsg
 
     def print_all_people(self, args):
@@ -383,7 +401,6 @@ class Amity:
                 if person.person_id == personid and person.role.upper() == "FELLOW":
                     print(person.name)
                     print(person.person_id)
-                    person_object = person
                     self.fellows.remove(person)
                     returnmsg = colored("{} deleted successfully"
                                         .format(person.name), "green")
@@ -451,8 +468,6 @@ class Amity:
                 session = Session(bind=engine)
                 rooms = self.office + self.lspace
                 persons = self.fellows + self.staff
-
-
                 for room in rooms:
                     session.add(RoomStore(room_id=room.room_id, room_name=room.room_name,
                                           room_type=room.room_type))
@@ -510,92 +525,102 @@ class Amity:
 
     def load_state(self, database):
         """ method to load data from the database """
+        file_exists = os.path.isfile('models/db/'+database+'.db')
+        if file_exists is False:
+            returnmsg = colored("Could not find {}, it does not exist! ".format(database), "red")
+        else:
+            persons = self.fellows + self.staff
+            engine = create_engine('sqlite:///models/db/'+database+'.db')
+            Base.metadata.bind = engine
+            session = Session(bind=engine)
 
-        persons = self.fellows + self.staff
-        engine = create_engine('sqlite:///models/db/'+database+'.db')
-        Base.metadata.bind = engine
-        session = Session(bind=engine)
+            roomstore = session.query(RoomStore.room_id,
+                                      RoomStore.room_name, RoomStore.room_type).all()
 
-        roomstore = session.query(RoomStore.room_id, RoomStore.room_name, RoomStore.room_type).all()
+            for rooms in roomstore:
+                if rooms.room_type == "Office":
+                    office = Office(rooms.room_name)
+                    office.room_id = rooms.room_id
+                    self.office.append(office)
 
-        for rooms in roomstore:
-            if rooms.room_type == "Office":
-                office = Office(rooms.room_name)
-                office.room_id = rooms.room_id
-                self.office.append(office)
+                elif rooms.room_type == "LivingSpace":
+                    lspace = LivingSpace(rooms.room_name)
+                    lspace.room_id = rooms.room_id
+                    self.lspace.append(lspace)
 
-            elif rooms.room_type == "LivingSpace":
-                lspace = LivingSpace(rooms.room_name)
-                lspace.room_id = rooms.room_id
-                self.lspace.append(lspace)
-
-        roomslist = self.office + self.lspace
-
-
-        personstore = session.query(PersonStore.first_name, PersonStore.last_name,
-                                    PersonStore.person_id, PersonStore.role,
-                                    PersonStore.accomodation).all()
-
-        for persons in personstore:
-            if persons.role == "FELLOW":
-                fellow = Fellow(persons.first_name, persons.last_name,
-                                persons.role, persons.accomodation)
-                fellow.person_id = persons.person_id
-                self.fellows.append(fellow)
-
-            elif persons.role == "STAFF":
-                staff = Staff(persons.first_name, persons.last_name, persons.role)
-                staff.person_id = persons.person_id
-                self.staff.append(staff)
+            roomslist = self.office + self.lspace
 
 
+            personstore = session.query(PersonStore.first_name, PersonStore.last_name,
+                                        PersonStore.person_id, PersonStore.role,
+                                        PersonStore.accomodation).all()
 
-        allocationsstore = session.query(AllocationsStore.person_id, AllocationsStore.first_name,
-                                         AllocationsStore.last_name, AllocationsStore.person_role,
-                                         AllocationsStore.accomodation, AllocationsStore.room_name,
-                                         AllocationsStore.room_type).all()
+            for persons in personstore:
+                if persons.role == "FELLOW":
+                    fellow = Fellow(persons.first_name, persons.last_name,
+                                    persons.role, persons.accomodation)
+                    fellow.person_id = persons.person_id
+                    self.fellows.append(fellow)
 
-        for allocate in allocationsstore:
-            if allocate.person_role == "FELLOW":
-                fellow_allocated = Fellow(allocate.first_name, allocate.last_name,
-                                          allocate.person_role, allocate.accomodation)
-                fellow_allocated.person_id = allocate.person_id
-                for room in roomslist:
-                    if room.room_name == allocate.room_name:
-                        room.allocations.append(fellow_allocated)
-            elif allocate.person_role == "STAFF":
-                staff_allocated = Staff(allocate.first_name, allocate.last_name,
-                                        allocate.person_role)
-                staff_allocated.person_id = allocate.person_id
-                for room in roomslist:
-                    if room.room_name == allocate.room_name:
-                        room.allocations.append(staff_allocated)
+                elif persons.role == "STAFF":
+                    staff = Staff(persons.first_name, persons.last_name, persons.role)
+                    staff.person_id = persons.person_id
+                    self.staff.append(staff)
 
-        unallocatedstore = session.query(UnallocatedStore.person_id, UnallocatedStore.first_name,
-                                         UnallocatedStore.last_name, UnallocatedStore.person_role,
-                                         UnallocatedStore.accomodation,
-                                         UnallocatedStore.room_type).all()
+            allocationsstore = session.query(AllocationsStore.person_id,
+                                             AllocationsStore.first_name,
+                                             AllocationsStore.last_name,
+                                             AllocationsStore.person_role,
+                                             AllocationsStore.accomodation,
+                                             AllocationsStore.room_name,
+                                             AllocationsStore.room_type).all()
 
-        for unallocated in unallocatedstore:
-            if unallocated.person_role == "FELLOW":
-                fellow_unallocated = Fellow(unallocated.first_name, unallocated.last_name,
-                                            unallocated.person_role, unallocated.accomodation)
-                fellow_unallocated.person_id = unallocated.person_id
-                if unallocated.room_type == "Office":
-                    self.unallocated_office.append(fellow_unallocated)
-                elif unallocated.room_type == "LivingSpace":
-                    self.unallocated_lspace.append(fellow_unallocated)
-            elif unallocated.person_role == "STAFF":
-                staff_unallocated = Staff(unallocated.first_name, unallocated.last_name,
-                                          unallocated.person_role)
-                staff_unallocated.person_id = unallocated.person_id
-                if unallocated.room_type == "Office":
-                    self.unallocated_office.append(staff_unallocated)
-        dbpath = os.path.dirname(__file__)
-        dbname = os.path.join(dbpath, 'db/'+database+'.db')
-        os.remove(dbname)
-        session.close()
-        print(colored("Data loaded successfully from database"+
-                      " with the name: {}".format(database), "green"))
+            for allocate in allocationsstore:
+                if allocate.person_role == "FELLOW":
+                    fellow_allocated = Fellow(allocate.first_name, allocate.last_name,
+                                              allocate.person_role, allocate.accomodation)
+                    fellow_allocated.person_id = allocate.person_id
+                    for room in roomslist:
+                        if room.room_name == allocate.room_name:
+                            room.allocations.append(fellow_allocated)
+                elif allocate.person_role == "STAFF":
+                    staff_allocated = Staff(allocate.first_name, allocate.last_name,
+                                            allocate.person_role)
+                    staff_allocated.person_id = allocate.person_id
+                    for room in roomslist:
+                        if room.room_name == allocate.room_name:
+                            room.allocations.append(staff_allocated)
+
+            unallocatedstore = session.query(UnallocatedStore.person_id,
+                                             UnallocatedStore.first_name,
+                                             UnallocatedStore.last_name,
+                                             UnallocatedStore.person_role,
+                                             UnallocatedStore.accomodation,
+                                             UnallocatedStore.room_type).all()
+
+            for unallocated in unallocatedstore:
+                if unallocated.person_role == "FELLOW":
+                    fellow_unallocated = Fellow(unallocated.first_name, unallocated.last_name,
+                                                unallocated.person_role, unallocated.accomodation)
+                    fellow_unallocated.person_id = unallocated.person_id
+                    if unallocated.room_type == "Office":
+                        self.unallocated_office.append(fellow_unallocated)
+                    elif unallocated.room_type == "LivingSpace":
+                        self.unallocated_lspace.append(fellow_unallocated)
+                elif unallocated.person_role == "STAFF":
+                    staff_unallocated = Staff(unallocated.first_name, unallocated.last_name,
+                                              unallocated.person_role)
+                    staff_unallocated.person_id = unallocated.person_id
+                    if unallocated.room_type == "Office":
+                        self.unallocated_office.append(staff_unallocated)
+            dbpath = os.path.dirname(__file__)
+            dbname = os.path.join(dbpath, 'db/'+database+'.db')
+            os.remove(dbname)
+            session.close()
+            returnmsg = (colored("Data loaded successfully from database"+
+                                 " with the name: {}".format(database), "green"))
+
+        return returnmsg
+
 
 
