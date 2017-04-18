@@ -1,6 +1,7 @@
 """
 This file contains all the methods in the amity application which are contained in class Amity
 
+
 """
 import os.path
 import random
