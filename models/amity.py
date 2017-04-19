@@ -11,8 +11,8 @@ from termcolor import colored
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from models.person import Person, Fellow, Staff
-from models.room import Room, Office, LivingSpace
+from models.person import Fellow, Staff
+from models.room import Office, LivingSpace
 from models.db.sqlalchemy_declarative import (Base, PersonStore, FellowStore, StaffStore, RoomStore,
                                               OfficeStore, LSpaceStore, AllocationsStore,
                                               UnallocatedStore)
