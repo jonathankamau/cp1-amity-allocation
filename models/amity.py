@@ -182,7 +182,7 @@ class Amity:
                         newfellow.living = spacename
                         selectspace.allocations.append(newfellow)
                         returnmsg = colored("Fellow "+fname+
-                                            "assigned living space "+spacename, "green")
+                                            " assigned living space "+spacename, "green")
                     else:
                         self.unallocated_lspace.append(newfellow)
                         returnmsg = colored("Fellow not assigned living space!!", "red")
@@ -371,6 +371,10 @@ class Amity:
                         for room in rooms:
                             if room.room_name.title() in given_room:
                                 room.allocations.remove(person_object)
+                            elif given_room[0] == '' and person_object in self.unallocated_office:
+                                self.unallocated_office.remove(person_object)
+                            elif given_room[1] == '' and person_object in self.unallocated_lspace:
+                                self.unallocated_lspace.remove(person_object)
                         room_object.allocations.append(person_object)
                         returnmsg = (colored("{} has been reallocated"
                                              " successfully to room {}"
@@ -445,8 +449,8 @@ class Amity:
                                 self.unallocated_office.remove(person_object)
                                 returnmsg.append(colored("{} deleted successfully"
                                                          .format(person_object.name), "green"))
-                # else:
-                #     returnmsg = colored("Could not delete person!!", "red")
+                else:
+                    returnmsg = colored("Could not delete person!!", "red")
 
         return '\n'.join(returnmsg)
 
