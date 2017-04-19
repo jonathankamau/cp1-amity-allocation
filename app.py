@@ -146,11 +146,13 @@ class AmityApp (cmd.Cmd):
     @docopt_cmd
     def do_print_unallocated(self, args):
         """Usage: print_unallocated [--o=<filename>]"""
+
         self.amity.print_unallocated(args)
 
     @docopt_cmd
     def do_print_all_people(self, args):
         """Usage: print_all_people"""
+
         self.amity.print_all_people(args)
 
     @docopt_cmd
@@ -170,14 +172,18 @@ class AmityApp (cmd.Cmd):
     @docopt_cmd
     def do_save_state(self, args):
         """Usage: save_state [--db=sqlite_database]"""
-
-        self.amity.save_state(args)
+        if not re.match("^[A-Za-z]*$", args['--db']):
+            print(colored("Invalid input! Please enter filename in string format", "red"))
+        else:
+            print(self.amity.save_state(args))
 
     @docopt_cmd
     def do_load_state(self, args):
         """Usage: load_state <database>"""
-
-        print(self.amity.load_state(args['<database>']))
+        if not re.match("^[A-Za-z]*$", args['<database>']):
+            print(colored("Invalid input! Please enter room name in string format", "red"))
+        else:
+            print(self.amity.load_state(args['<database>']))
 
     def do_quit(self, args):
         """Quits out of Interactive Mode."""
