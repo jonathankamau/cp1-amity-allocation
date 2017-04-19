@@ -256,7 +256,8 @@ class Amity:
                     printroom.append("\n")
                 else:
                     printroom.append(colored("No room allocations available for {}!\n"
-                                             .format(room.room_name), "red", "on_blue"))
+                                             .format(room.room_name),
+                                             "red", "on_blue", attrs=['bold']))
                 if len(room.allocations) > 0 and args["--o"]:
                     if not re.match("^[A-Za-z]*$", args['--o']):
                         printerror = ("Invalid input! Please enter"+
@@ -274,7 +275,7 @@ class Amity:
             if printfile != '':
                 print(colored(printfile, "green"))
             elif printerror != '':
-                print(colored(printerror, "red"))
+                print(colored(printerror, "red", "on_blue"))
             else:
                 print(colored(' '.join(printroom), "green", "on_blue", attrs=['bold']))
 

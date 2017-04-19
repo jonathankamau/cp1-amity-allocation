@@ -126,11 +126,12 @@ class AmityTest(unittest.TestCase):
         name = "John Mark"
         self.amity.create_room("office", roomname)
         self.amity.add_person("John", "Mark", "fellow", "N")
+        self.amity.create_room("office", "mombasa")
         for fellow in self.amity.fellows:
             if fellow.name == name:
                 fellowid = fellow.person_id
         message = "has been reallocated successfully"
-        returnmsg = self.amity.reallocate_person(fellowid, "embu")
+        returnmsg = self.amity.reallocate_person(fellowid, "mombasa")
         self.assertIn(message, returnmsg, msg="Not reallocated")
 
     def test_prints_allocations_tofile(self):
