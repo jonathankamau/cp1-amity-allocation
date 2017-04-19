@@ -8,8 +8,7 @@ env:
 - DB=sqlite 
 addons: 
 script:
-- --omit=*/tests/* test_* *sqlalchemy/* *models/db/sqlalchemy_declarative.py *decimal.py *numbers.py 
-- nosetests --with -coverage
+- nosetests --with-coverage
 # after_success:
 #  - echo “choose one”
 cache: pip
