@@ -123,14 +123,16 @@ class AmityTest(unittest.TestCase):
     def test_reallocate_person(self):
         """ tests if person was reallocated """
         roomname = ['meru', 'embu']
+        other_rooms = ['mombasa', 'malindi']
         name = "John Mark"
         self.amity.create_room("office", roomname)
         self.amity.add_person("John", "Mark", "fellow", "N")
+        self.amity.create_room("office", other_rooms)
         for fellow in self.amity.fellows:
             if fellow.name == name:
                 fellowid = fellow.person_id
         message = "has been reallocated successfully"
-        returnmsg = self.amity.reallocate_person(fellowid, "embu")
+        returnmsg = self.amity.reallocate_person(fellowid, "mombasa")
         self.assertIn(message, returnmsg, msg="Not reallocated")
 
     def test_prints_allocations_tofile(self):
