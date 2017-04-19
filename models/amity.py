@@ -52,6 +52,7 @@ class Amity:
                     returnmsg = colored(' '.join(names_created), "green")
 
         elif roomtype.upper() == "LIVING":
+            names_created = ["The following living spaces were created successfully:"]
             for name in roomname:
                 if  any(spaces.room_name.title() == name.title() for spaces in all_rooms):
                     names_exist.append(name.title())
