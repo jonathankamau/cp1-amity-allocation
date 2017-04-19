@@ -9,8 +9,14 @@ env:
 addons:
   
 script:
-  - coverage run --omit=*/tests/* test_* *sqlalchemy/* *models/db/sqlalchemy_declarative.py *decimal.py *numbers.py 
-  - coverage run nosetests --with -coverage
-  
-  
-cache: pip
+  - --omit=*/tests/* test_* *sqlalchemy/* *models/db/sqlalchemy_declarative.py *decimal.py *numbers.py 
+  - nosetests --with -coverage
+
+after_success:
+ - echo “choose one”
+ 
+ cache: pip
+ 
+ notifications:
+ 
+ email: false
