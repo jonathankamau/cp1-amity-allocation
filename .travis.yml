@@ -4,19 +4,13 @@ python:
 install:
     - pip install -r requirements.txt
 env:
-  - DB=sqlite
-  
-addons:
-  
+    - DB=sqlite 
+addons: 
 script:
   - --omit=*/tests/* test_* *sqlalchemy/* *models/db/sqlalchemy_declarative.py *decimal.py *numbers.py 
   - nosetests --with -coverage
-
 # after_success:
 #  - echo “choose one”
-
  cache: pip
- 
  notifications:
- 
- email: false
+  email: false
