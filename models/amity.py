@@ -31,46 +31,54 @@ class Amity:
         """ method that creates room"""
         if roomtype.upper() == "OFFICE":
             all_rooms = self.office + self.lspace
-            names_exist = ["The following offices exist:"]
+            names_exist = ["The following rooms exist:"]
             names_created = ["The following offices were created successfully:"]
+            error = ["The following rooms could not be created due to length:"]
             for name in roomname:
-                if  any(offices.room_name == name for offices in all_rooms):
+                if  any(offices.room_name.title() == name.title() for offices in all_rooms):
                     names_exist.append(name.title())
-                else:
+                elif len(name) > 35:
+                    error.append(name)
+                    print(colored(' '.join(error), "red"))
+                elif len(name) < 35:
                     self.office.append(Office(name.title()))
                     names_created.append(name.title())
-            if len(names_exist) > 1 and len(names_created) == 1:
-                returnmsg = colored(' '.join(names_exist), "red")
-            elif len(names_exist) > 1 and len(names_created) > 1:
-                returnmsg = (colored(' '.join(names_exist), "red"),
-                             colored(' '.join(names_created), "green"))
-            else:
-                returnmsg = colored(' '.join(names_created), "green")
+                if len(names_exist) > 1 and len(names_created) == 1:
+                    returnmsg = colored(' '.join(names_exist), "red")
+                elif len(names_exist) > 1 and len(names_created) > 1:
+                    returnmsg = (colored(' '.join(names_exist), "red"),
+                                 colored(' '.join(names_created), "green"))
+                else:
+                    returnmsg = colored(' '.join(names_created), "green")
 
-            return returnmsg
         elif roomtype.upper() == "LIVING":
             all_rooms = self.office + self.lspace
-            names_exist = ["The following living spaces exist:"]
+            names_exist = ["The following rooms exist:"]
             names_created = ["The following living spaces were created successfully:"]
+            error = ["The following rooms could not be created due to length:"]
             for name in roomname:
-                if  any(spaces.room_name == name for spaces in self.lspace):
+                if  any(spaces.room_name.title() == name.title() for spaces in all_rooms):
                     names_exist.append(name.title())
-                else:
+                elif len(name) > 35:
+                    error.append(name)
+                    print(colored(' '.join(error), "red"))
+                elif len(name) < 35:
                     self.lspace.append(LivingSpace(name.title()))
                     names_created.append(name.title())
-            if len(names_exist) > 1 and len(names_created) == 1:
-                returnmsg = colored(' '.join(names_exist), "red")
-            elif len(names_exist) > 1 and len(names_created) > 1:
-                returnmsg = (colored(' '.join(names_exist), "red"),
-                             colored(' '.join(names_created), "green"))
-            else:
-                returnmsg = colored(' '.join(names_created), "green")
+                if len(names_exist) > 1 and len(names_created) == 1:
+                    returnmsg = colored(' '.join(names_exist), "red")
+                elif len(names_exist) > 1 and len(names_created) > 1:
+                    returnmsg = (colored(' '.join(names_exist), "red"),
+                                 colored(' '.join(names_created), "green"))
+                else:
+                    returnmsg = colored(' '.join(names_created), "green")
 
-            return returnmsg
 
         else:
             return colored("Room not created!! check your input format and try again"
                            "\n Usage: create_room <roomtype> <roomname>...", "red")
+
+        return returnmsg
 
     def add_person(self, firstname, lastname, role, accomodation="N"):
         """ adds a person """
@@ -93,7 +101,6 @@ class Amity:
                 allocateoffice = colored(self.allocate_fellow_office(newfellow, fname), "green")
                 allocateliving = colored(self.allocate_fellow_livingspace
                                          (newfellow, fname, accomodation), "green")
-
             if (allocateoffice and allocateliving) == '':
                 return "{}".format(returnmsg)
             else:
@@ -289,7 +296,7 @@ class Amity:
         else:
             print_office = ["Here is the list of people not allocated an office space: \n"]
             print_office.append("-" *50 + "\n")
-            print_living = ["Here is the list of people not allocated a living space: \n"]
+            print_living = ["\nHere is the list of people not allocated a living space: \n"]
             print_living.append("-" *50 + "\n")
             if self.unallocated_office == []:
                 printout += colored("All persons were allocated offices!\n", "red")
@@ -391,58 +398,58 @@ class Amity:
         """ Deletes a person from the system """
         people = self.fellows + self.staff
         rooms = self.office + self.lspace
+        returnmsg = []
         personal_id = [person.person_id for person in people]
-        unallocated = self.unallocated_office + self.unallocated_lspace
         personid = int(personid)
         if personid not in personal_id:
-            returnmsg = colored("ID does not exist!!", "red")
+            returnmsg.append(colored("ID does not exist!!", "red"))
         else:
             for person in people:
                 if person.person_id == personid and person.role.upper() == "FELLOW":
-                    print(person.name)
-                    print(person.person_id)
+                    person_object = person
                     self.fellows.remove(person)
-                    returnmsg = colored("{} deleted successfully"
-                                        .format(person.name), "green")
+                    returnmsg.append(colored("{} deleted successfully"
+                                             .format(person.name), "green"))
                     for room in rooms:
-                        if person.office == room.room_name:
-                            print(person.office)
-                            print(room.room_name)
-                            room.allocations.remove(person)
-                            returnmsg = colored("{} removed from office {}"
-                                                .format(person.name, room.room_name), "green")
-                        elif person.living == room.room_name:
-                            print("person living"+person.living)
-                            print("Living"+room.room_name)
-                            room.allocations.remove(person)
-                            returnmsg = colored("{} removed from living space {}"
-                                                .format(person.name, room.room_name), "green")
+                        if person_object.office.title() == room.room_name.title():
+                            room.allocations.remove(person_object)
+                            returnmsg.append(colored("{} removed from office {}"
+                                                     .format(person_object.name,
+                                                             room.room_name), "green"))
+                        elif person_object.living.title() == room.room_name.title():
+                            room.allocations.remove(person_object)
+                            returnmsg.append(colored("{} removed from living space {}"
+                                                     .format(person_object.name,
+                                                             room.room_name), "green"))
                         for unallocate in self.unallocated_office:
                             if unallocate.person_id == personid and unallocate.office == '':
-                                print(unallocate.name)
                                 self.unallocated_office.remove(person)
-                                returnmsg = colored("{} removed from office unallocated list"
-                                                    .format(person.name), "green")
+                                returnmsg.append(colored("{} removed from office"
+                                                         "unallocated list"
+                                                         .format(person_object.name), "green"))
                         for unallocate in self.unallocated_lspace:
                             if unallocate.person_id == personid and unallocate.living == '':
-                                print(unallocate.name)
-                                self.unallocated_lspace.remove(person)
-                                returnmsg = colored("{} removed from living space unallocated list"
-                                                    .format(person.name), "green")
+                                self.unallocated_lspace.remove(person_object)
+                                returnmsg.append(colored("{} removed from living"
+                                                         "space unallocated list"
+                                                         .format(person_object.name), "green"))
                 elif person.person_id == personid and person.role.upper() == "STAFF":
-                    self.staff.remove(person)
+                    person_object = person
+                    self.staff.remove(person_object)
+                    returnmsg.append(colored("{} deleted successfully"
+                                             .format(person.name), "green"))
                     for room in rooms:
-                        if person.office == room.room_name:
-                            room.allocations.remove(person)
-                    for unallocate in unallocated:
-                        if unallocate.person_id == personid and unallocate.office == '':
-                            self.unallocated_office.remove(person)
-                            returnmsg = colored("{} deleted successfully"
-                                                .format(person.name), "green")
-                else:
-                    returnmsg = colored("Could not delete person!!", "red")
+                        if person_object.office.title() == room.room_name.title():
+                            room.allocations.remove(person_object)
+                        for unallocate in self.unallocated_office:
+                            if unallocate.person_id == personid and unallocate.office == '':
+                                self.unallocated_office.remove(person_object)
+                                returnmsg.append(colored("{} deleted successfully"
+                                                         .format(person_object.name), "green"))
+                # else:
+                #     returnmsg = colored("Could not delete person!!", "red")
 
-            return returnmsg
+        return '\n'.join(returnmsg)
 
     def print_all_rooms(self, args):
         """ prints a list of all rooms """
