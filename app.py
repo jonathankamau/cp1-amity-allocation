@@ -73,8 +73,6 @@ def docopt_cmd(func):
 
 
 class AmityApp (cmd.Cmd):
-    #text = cprint('Amity Room Allocation', 'green', 'on_red')
-    #text = colored('', 'red', attrs=['reverse', 'blink'])
     intro = 'Welcome to amity room allocations!' \
         + ' (type help for a list of commands.)'
     prompt = '(amity)'
@@ -191,12 +189,8 @@ class AmityApp (cmd.Cmd):
         print(colored('Adios! Hope to see you again soon', 'green'))
         exit()
 
-#opt = docopt(__doc__, sys.argv[1:])
+
 
 if __name__ == '__main__':
     print(colored(__doc__, 'green', 'on_blue', attrs=['bold']))
     AmityApp().cmdloop()
-# if opt['--interactive']:
-#     AmityApp().cmdloop()
-
-# print(opt)
