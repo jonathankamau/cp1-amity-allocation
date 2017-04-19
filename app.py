@@ -33,7 +33,7 @@ from models.amity import Amity
 
 
 cprint(figlet_format("AMITY ROOM ALLOCATION".center(
-    30), font="standard"), "blue", "on_yellow", attrs=["blink"])
+    30), font="standard"), "blue", "on_yellow", attrs=["bold"])
 cprint("\n")
 
 def docopt_cmd(func):
