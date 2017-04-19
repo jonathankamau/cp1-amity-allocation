@@ -222,7 +222,7 @@ class AmityTest(unittest.TestCase):
         room_name = ['meru', 'embu', 'valhalla']
         self.amity.create_room("office", room_name)
         self.amity.add_person("John", "Mark", "fellow", "Y")
-        returnmsg = self.amity.save_state({'--db':'tester'})
+        returnmsg = self.amity.save_state({'--db':'monthly'})
         self.assertIn("Data stored successfully in database",
                       returnmsg, msg="Could not store to database!")
 
