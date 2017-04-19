@@ -1,5 +1,5 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/475f95a67aea4b2a9cef2d901d9b7e7d)](https://www.codacy.com/app/jonathankamau/cp1-amity-allocation?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jonathankamau/cp1-amity-allocation&amp;utm_campaign=Badge_Grade)
-[![Build Status](https://travis-ci.org/jonathankamau/cp1-amity-allocation.png?branch=master)](https://travis-ci.org/jonathankamau/cp1-amity-allocation)
+[![Build Status](https://travis-ci.org/jonathankamau/cp1-amity-allocation.png?branch=develop)](https://travis-ci.org/jonathankamau/cp1-amity-allocation)
 # cp1-amity-allocation
 
 DESCRIPTION 
