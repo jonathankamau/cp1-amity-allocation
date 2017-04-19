@@ -29,11 +29,11 @@ class Amity:
 
     def create_room(self, roomtype, roomname):
         """ method that creates room"""
+        all_rooms = self.office + self.lspace
+        names_exist = ["The following rooms exist:"]
+        names_created = ["The following offices were created successfully:"]
+        error = ["The following rooms could not be created due to length:"]
         if roomtype.upper() == "OFFICE":
-            all_rooms = self.office + self.lspace
-            names_exist = ["The following rooms exist:"]
-            names_created = ["The following offices were created successfully:"]
-            error = ["The following rooms could not be created due to length:"]
             for name in roomname:
                 if  any(offices.room_name.title() == name.title() for offices in all_rooms):
                     names_exist.append(name.title())
@@ -52,10 +52,6 @@ class Amity:
                     returnmsg = colored(' '.join(names_created), "green")
 
         elif roomtype.upper() == "LIVING":
-            all_rooms = self.office + self.lspace
-            names_exist = ["The following rooms exist:"]
-            names_created = ["The following living spaces were created successfully:"]
-            error = ["The following rooms could not be created due to length:"]
             for name in roomname:
                 if  any(spaces.room_name.title() == name.title() for spaces in all_rooms):
                     names_exist.append(name.title())
@@ -259,7 +255,7 @@ class Amity:
                     printroom.append("\n")
                 else:
                     printroom.append(colored("No room allocations available for {}!\n"
-                                             .format(room.room_name), "red"))
+                                             .format(room.room_name), "red", "on_blue"))
                 if len(room.allocations) > 0 and args["--o"]:
                     if not re.match("^[A-Za-z]*$", args['--o']):
                         printerror = ("Invalid input! Please enter"+
@@ -355,6 +351,7 @@ class Amity:
                     person_object = person
             for room in rooms:
                 if room.room_name.upper() == new_room_name.upper():
+                    room_object = room
                     if person_object in room.allocations:
                         returnmsg = (colored("{} already exists in room {}"
                                              .format(person_object.name, room.room_name), "red"))
@@ -373,11 +370,12 @@ class Amity:
                         for room in rooms:
                             if room.room_name.title() in given_room:
                                 room.allocations.remove(person_object)
-                        room.allocations.append(person_object)
+                        room_object.allocations.append(person_object)
                         returnmsg = (colored("{} has been reallocated"
                                              " successfully to room {}"
                                              .format(person_object.name,
-                                                     room.room_name), "green"))
+                                                     room_object.room_name), "green"))
+
 
         return returnmsg
 
@@ -524,11 +522,13 @@ class Amity:
 
                 session.commit()
                 session.close()
-                print(colored("Data stored successfully in database"+
-                              " with the name: {}".format(args["--db"]), "green"))
+                returnmsg = (colored("Data stored successfully in database"
+                                     " with the name: {}".format(args["--db"]), "green"))
         else:
-            print(colored("Please give the DB name!", "red"))
-            print("Usage: save_state --db=db_name")
+            returnmsg = (colored("Please give the DB name!"
+                                 "\n Usage: save_state --db=db_name", "red"))
+
+        return returnmsg
 
     def load_state(self, database):
         """ method to load data from the database """
