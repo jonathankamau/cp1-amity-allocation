@@ -1,0 +1,9 @@
+[31mAll persons were allocated offices!
+[0mHere is the list of people not allocated an office space: 
+ --------------------------------------------------
+Here is the list of people not allocated a living space: 
+ --------------------------------------------------
+ Name: Oluwafemi Sule,  ID: 4452001008
+ Name: Simon Patterson,  ID: 4452001520
+ Name: Mari Lawrence,  ID: 4452000880
+ Name: Tana Lopez,  ID: 4452001648

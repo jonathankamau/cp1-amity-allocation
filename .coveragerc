@@ -1,0 +1,11 @@
+[run]
+omit =
+    */tests/*
+    test_*
+    *sqlalchemy/*
+    *models/db/sqlalchemy_declarative.py
+    *decimal.py
+    *numbers.py
+    *termcolor.py
+    *sqlite3.py
+    *sqlite3/dbapi2.py

@@ -1,0 +1,6 @@
+Here is the list of people not allocated an office space: 
+ --------------------------------------------------
+ Name: John Mark,  ID: 4500287536
+Here is the list of people not allocated a living space: 
+ --------------------------------------------------
+ Name: John Mark,  ID: 4500287536

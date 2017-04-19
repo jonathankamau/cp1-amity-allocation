@@ -1,0 +1,17 @@
+language: python
+
+python:
+- "3.6"
+install:
+- pip install -r requirements.txt
+env:
+- DB=sqlite 
+addons: 
+script:
+- nosetests --with-coverage
+# after_success:
+#  - echo “choose one”
+cache: pip
+
+notifications:
+ email: false
