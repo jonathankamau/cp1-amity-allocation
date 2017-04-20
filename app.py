@@ -67,10 +67,6 @@ def docopt_cmd(func):
     fn.__dict__.update(func.__dict__)
     return fn
 
-    # def start():
-    #     os.system("clear")
-    #     print(__doc__)
-
 
 class AmityApp (cmd.Cmd):
     intro = 'Welcome to amity room allocations!' \
@@ -81,11 +77,14 @@ class AmityApp (cmd.Cmd):
     @docopt_cmd
     def do_create_room(self, args):
         """Usage: create_room <roomtype> <roomname>..."""
+        # check if input given is a string, if not returns error
         if not re.match("^[A-Za-z]*$", args['<roomtype>']):
             print(colored("Invalid input! Please enter roomtype in string format", "red"))
+            # check if input given is a string, if not returns error
         elif not re.match("^[A-Za-z]*$", ''.join(args['<roomname>'])):
             print(colored("Invalid input! Please enter roomname in string format", "red"))
         else:
+            # prints the output from the method
             print(self.amity.create_room(args['<roomtype>'], args['<roomname>']))
 
 
@@ -94,29 +93,37 @@ class AmityApp (cmd.Cmd):
         """Usage: add_person <firstname> <lastname> <role> [<accomodation>]"""
         if args['<accomodation>'] is None:
             args['<accomodation>'] = "N"
+            # check if input given is a string, if not returns error
         if not re.match("^[A-Za-z]*$", args['<firstname>']):
             print(colored("Invalid input! Please enter firstname in string format", "red"))
+            # check if input given is a string, if not returns error
         elif not re.match("^[A-Za-z]*$", args['<lastname>']):
             print(colored("Invalid input! Please enter lastname in string format", "red"))
+            # check if input given is a string, if not returns error
         elif not re.match("^[A-Za-z]*$", args['<role>']):
             print(colored("Invalid input! Please enter role in string format", "red"))
+            # check if input given is either Y, N or blank, if not returns error
         elif not re.match("^[YN' 'yn]*$", args['<accomodation>']):
             print(colored("Invalid input! Please enter accomodation in string format", "red"))
         else:
+            # prints the output from the method
             print(self.amity.add_person(args['<firstname>'], args['<lastname>'],
                                         args['<role>'], args['<accomodation>']))
 
     @docopt_cmd
     def do_load_people(self, args):
         """Usage: load_people [--o=<filename>]"""
+        # check if input given is a string, if not returns error
         if not re.match("^[A-Za-z]*$", args['--o']):
             print(colored("Invalid input! Please enter filename in string format", "red"))
         else:
+            # prints the output from the method
             print(self.amity.load_people(args['--o']))
 
     @docopt_cmd
     def do_print_room(self, args):
         """Usage: print_room <roomname>"""
+        # check if input given is a string, if not returns error
         if not re.match("^[A-Za-z]*$", args['<roomname>']):
             print(colored("Invalid input! Please enter room name in string format", "red"))
         else:
@@ -125,12 +132,15 @@ class AmityApp (cmd.Cmd):
     @docopt_cmd
     def do_reallocate_person(self, args):
         """ Usage: reallocate_person <person_identifier> <new_room_name> """
+        # check if input given is an integer, if not returns error
         if not re.match("^[0-9]+$", args['<person_identifier>']):
             print(colored("Invalid input!"+
                           " Please enter person_identifier in ID number format", "red"))
+        # check if input given is a string, if not returns error
         elif not re.match("^[A-Za-z]*$", args['<new_room_name>']):
             print(colored("Invalid input! Please enter the newroom name in string format", "red"))
         else:
+            # prints the output from the method
             print(self.amity.reallocate_person(args
                                                ['<person_identifier>'], args['<new_room_name>']))
 
@@ -138,54 +148,61 @@ class AmityApp (cmd.Cmd):
     @docopt_cmd
     def do_print_allocations(self, args):
         """Usage: print_allocations [--o=<filename>]"""
-
+        # prints the output from the method
         self.amity.print_allocations(args)
 
     @docopt_cmd
     def do_print_unallocated(self, args):
         """Usage: print_unallocated [--o=<filename>]"""
-
+        # prints the output from the method
         self.amity.print_unallocated(args)
 
     @docopt_cmd
     def do_print_all_people(self, args):
         """Usage: print_all_people"""
-
+        # prints the output from the method
         self.amity.print_all_people(args)
 
     @docopt_cmd
     def do_print_all_rooms(self, args):
         """Usage: print_all_rooms"""
+        # prints the output from the method
         self.amity.print_all_rooms(args)
 
     @docopt_cmd
     def do_delete_person(self, args):
         """Usage: delete_person <personid>"""
+        # check if input given is an integer, if not returns error
         if not re.match("^[0-9]+$", args['<personid>']):
             print(colored("Invalid input!"+
                           " Please enter person_identifier in ID number format", "red"))
         else:
+            # prints the output from the method
             print(self.amity.delete_person(args['<personid>']))
 
     @docopt_cmd
     def do_save_state(self, args):
         """Usage: save_state [--db=sqlite_database]"""
+        # check if input given is a string, if not returns error
         if not re.match("^[A-Za-z]*$", args['--db']):
             print(colored("Invalid input! Please enter filename in string format", "red"))
         else:
+            # prints the output from the method
             print(self.amity.save_state(args))
 
     @docopt_cmd
     def do_load_state(self, args):
         """Usage: load_state <database>"""
+        # check if input given is a string, if not returns error
         if not re.match("^[A-Za-z]*$", args['<database>']):
             print(colored("Invalid input! Please enter room name in string format", "red"))
         else:
+            # prints the output from the method
             print(self.amity.load_state(args['<database>']))
 
     def do_quit(self, args):
         """Quits out of Interactive Mode."""
-
+        # prints exit statement
         print(colored('Adios! Hope to see you again soon', 'green'))
         exit()
 
