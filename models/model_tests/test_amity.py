@@ -51,65 +51,94 @@ class AmityTest(unittest.TestCase):
 
     def test_for_create_office(self):
         """ Tests if office has been created """
+        # sets up the required parameters
         roomname = "Forest"
         roomtype = "Office"
+        # expected return message
         returnmsg = "The following offices were created successfully"
+        # saves return from method to a variable
         room_create = self.amity.create_room(roomtype, roomname)
+        # checks if the expected return what is actually returned by method
         self.assertIn(returnmsg, room_create, msg="Office not successfully created!!")
 
     def test_for_create_livingspace(self):
         """ Tests if living space has been created """
+        # sets up the required parameters
         roomname = "Coast"
         roomtype = "living"
+        # expected return message
         returnmsg = "The following living spaces were created successfully"
+        # saves return from method to a variable
         room_create = self.amity.create_room(roomtype, roomname)
+        # checks if the expected return what is actually returned by method
         self.assertIn(returnmsg, room_create, msg="Living Space not successfully created!!")
 
     def test_add_fellow(self):
         """ Tests if fellow has been added """
+        # sets up the required parameters
         firstname = "James"
         lastname = "Mwangi"
         role = "Fellow"
         accomodation = 'Y'
+        # expected return message
         returnmsg = "Fellow {} {} Added Successfully".format(firstname, lastname)
+        # saves return from method to a variable
         add_fellow = self.amity.add_person(firstname, lastname, role, accomodation)
+        # checks if the expected return what is actually returned by method
         self.assertIn(returnmsg, add_fellow, msg="Fellow not added!!")
 
     def test_add_staff(self):
         """ tests if staff has been added """
+         # sets up the required parameters
         firstname = "John"
         lastname = "Mweri"
         role = "Staff"
+        # expected return message
         returnmsg = "Staff {} {} Added Successfully".format(firstname, lastname)
+        # saves return from method to a variable
         add_staff = self.amity.add_person(firstname, lastname, role)
+        # checks if the expected return what is actually returned by method
         self.assertIn(returnmsg, add_staff, msg="Staff not added!!")
 
     def test_fellow_allocated_office(self):
         """ tests if fellow has been allocated office """
+        # sets up the required parameters
         roomname = ['meru', 'embu']
+        # creates the rooms
         self.amity.create_room("office", roomname)
         firstname = "James"
         lastname = "Mwangi"
         role = "Fellow"
         accomodation = 'Y'
+        # expected return message
         returnmsg = "Fellow {} {} assigned office".format(firstname, lastname)
+        # saves return from method to a variable
         add_fellow = self.amity.add_person(firstname, lastname, role, accomodation)
+        # checks if the expected return what is actually returned by method
         self.assertIn(returnmsg, add_fellow, msg="Fellow not added!!")
 
     def test_staff_allocated_office(self):
         """ tests if staff has been allocated office """
+        # sets up the required parameters
         firstname = "John"
         lastname = "Mwangi"
         role = "Staff"
+        # expected return message
         returnmsg = "Staff {} {} Added Successfully".format(firstname, lastname)
+        # saves return from method to a variable
         add_staff = self.amity.add_person(firstname, lastname, role)
+        # checks if the expected return what is actually returned by method
         self.assertIn(returnmsg, add_staff, msg="Staff not added!!")
 
     def test_load_people(self):
         """ tests if people were loaded to the application from file """
+        # sets up the required parameters
         testfile = "persons"
+        # expected return message
         returnmsg = "Added Successfully"
+        # saves return from method to a variable
         load_people = self.amity.load_people(testfile)
+        # checks if the expected return what is actually returned by method
         self.assertIn(returnmsg, load_people, msg="People not loaded from file!")
 
     def test_for_fellow_inheritance(self):
@@ -122,53 +151,77 @@ class AmityTest(unittest.TestCase):
 
     def test_reallocate_person(self):
         """ tests if person was reallocated """
+        # sets up the required parameters
         roomname = ['meru', 'embu']
         other_rooms = ['mombasa', 'malindi']
         name = "John Mark"
+        # creates rooms
         self.amity.create_room("office", roomname)
+        # creates person
         self.amity.add_person("John", "Mark", "fellow", "N")
+        # creates more rooms after adding person
         self.amity.create_room("office", other_rooms)
+        # checks if fellow is in fellow list
         for fellow in self.amity.fellows:
             if fellow.name == name:
                 fellowid = fellow.person_id
+        # expected return message
         message = "has been reallocated successfully"
+        # saves return from method to a variable
         returnmsg = self.amity.reallocate_person(fellowid, "mombasa")
+        # checks if the expected return what is actually returned by method
         self.assertIn(message, returnmsg, msg="Not reallocated")
 
     def test_prints_allocations_tofile(self):
         """ tests if it prints room allocations to file """
+        # sets up the required parameters
         roomname = ['meru', 'embu']
+        # creates rooms
         self.amity.create_room("office", roomname)
+        # creates person
         self.amity.add_person("John", "Mark", "fellow", "N")
+        # gets print output from running method print_allocations with file option
         with self.captured_output() as (out, err):
             self.amity.print_allocations({"--o":"testfile"})
             output = out.getvalue()
+            # checks if the expected output what is actually returned by method
         self.assertIn("list of allocations has been saved",
                       output, msg="allocations not printed to file!")
 
     def test_prints_allocations_screen(self):
         """ tests if it prints room allocations to screen """
+        # sets up the required parameters
         roomname = ['meru', 'embu']
+        # creates rooms
         self.amity.create_room("office", roomname)
+        # adds person
         self.amity.add_person("John", "Mark", "fellow", "N")
+        # gets print output from running method print_allocations
         with self.captured_output() as (out, err):
             self.amity.print_allocations({'--o':''})
             output = out.getvalue()
+        # checks if the expected output what is actually returned by method
         self.assertIn("Name:",
                       output, msg="allocations not printed to screen!")
 
     def test_print_unallocated_toscreen(self):
         """ tests if it prints unallocated staff and fellows """
+        # adds person
         self.amity.add_person("John", "Mark", "fellow", "Y")
+        # gets print output from running method print_unallocated
         with self.captured_output() as (out, err):
             self.amity.print_unallocated({"--o":""})
             output = out.getvalue()
+            # expected output
         message = "Here is the list of people not allocated"
+        # checks if the expected output what is actually returned by method
         self.assertIn(message, output, msg="unallocated people not printed to screen!")
 
     def test_print_unallocated_tofile(self):
         """ tests if it prints unallocated staff and fellows """
+        # adds person
         self.amity.add_person("John", "Mark", "fellow", "Y")
+        # gets print output from running method print_unallocated
         with self.captured_output() as (out, err):
             self.amity.print_unallocated({"--o":"unallocated"})
             output = out.getvalue()
@@ -177,52 +230,72 @@ class AmityTest(unittest.TestCase):
 
     def test_prints_room(self):
         """ tests if it prints list of people in a room """
+        # sets up parameters
         room_name = ['meru', 'embu', 'valhalla']
+        # creates room
         self.amity.create_room("office", room_name)
+        # adds people
         self.amity.add_person("John", "Mark", "fellow", "Y")
         roomname = "valhalla"
+        # checks if expected output is in method return
         self.assertIn("Room: VALHALLA", self.amity.print_room(roomname),
                       msg="Could not print room!")
 
     def test_print_all_people(self):
         """ tests if a person list was printed """
+        # sets up parameters
         room_name = ['meru', 'embu', 'valhalla']
+        # creates room
         self.amity.create_room("office", room_name)
+        # adds person
         self.amity.add_person("John", "Mark", "fellow", "Y")
+        # captures print output from method
         with self.captured_output() as (out, err):
             self.amity.print_all_people({'':''})
             output = out.getvalue()
+            # checks if expected output is in method return
         self.assertIn("Persons List", output, msg="people not printed to file!")
 
     def test_print_all_rooms(self):
         """ tests if a room list was printed """
+        # sets up parameters
         room_name = ['meru', 'embu', 'valhalla']
+        # creates room
         self.amity.create_room("office", room_name)
+        # adds person
         self.amity.add_person("John", "Mark", "fellow", "Y")
+        # captures print output from method
         with self.captured_output() as (out, err):
             self.amity.print_all_rooms({'':''})
             output = out.getvalue()
+            # checks if expected output is in method return
         self.assertIn("Rooms List", output, msg="people not printed to file!")
 
     def test_delete_person(self):
         """test if person was successfully deleted """
+        # sets up parameters
         room_name = ['meru', 'embu', 'valhalla']
+        # creates room
         self.amity.create_room("office", room_name)
         firstname = "John"
         lastname = "Mark"
         name = "{} {}".format(firstname, lastname)
         self.amity.add_person(firstname, lastname, "fellow", "Y")
+        # searches for person and retrieves id
         for fellow in self.amity.fellows:
             if fellow.name == name:
                 fellow_id = fellow.person_id
-
         returnmsg = self.amity.delete_person(fellow_id)
+        # checks if expected output is in method return
         self.assertIn("deleted successfully", returnmsg, msg="Person was not deleted!")
 
     def test_save_state(self):
         """Tests if data has been stored in db"""
+        # sets up parameters
         room_name = ['meru', 'embu', 'valhalla']
+        # create room
         self.amity.create_room("office", room_name)
+        # add person
         self.amity.add_person("John", "Mark", "fellow", "Y")
         returnmsg = self.amity.save_state({'--db':'monthly'})
         self.assertIn("Data stored successfully in database",
@@ -230,6 +303,7 @@ class AmityTest(unittest.TestCase):
 
     def test_load_state(self):
         """ tests if data has been loaded from db """
+        # sets up parameters
         database = "monthly"
         returnmsg = self.amity.load_state(database)
         self.assertIn("Data loaded successfully from database",
