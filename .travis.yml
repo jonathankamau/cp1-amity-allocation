@@ -3,15 +3,17 @@ language: python
 python:
 - "3.6"
 install:
+- pip install coveralls
 - pip install -r requirements.txt
 env:
 - DB=sqlite 
 addons: 
 script:
 - nosetests --with-coverage
-# after_success:
-#  - echo “choose one”
+after_success:
+  - coveralls
 cache: pip
 
 notifications:
  email: false
+

@@ -13,6 +13,7 @@ Usage:
     Amity print_all_people
     Amity print_all_rooms
     Amity delete_person <personid>
+    Amity delete_room <roomid>
     Amity (-i | --interactive)
     Amity (-h | --help | --version)
 Options:
@@ -175,10 +176,21 @@ class AmityApp (cmd.Cmd):
         # check if input given is an integer, if not returns error
         if not re.match("^[0-9]+$", args['<personid>']):
             print(colored("Invalid input!"+
-                          " Please enter person_identifier in ID number format", "red"))
+                          " Please enter the person ID in number format", "red"))
         else:
             # prints the output from the method
             print(self.amity.delete_person(args['<personid>']))
+
+    @docopt_cmd
+    def do_delete_room(self, args):
+        """Usage: delete_room <roomid>"""
+        # check if input given is an integer, if not returns error
+        if not re.match("^[0-9]+$", args['<roomid>']):
+            print(colored("Invalid input!"+
+                          " Please enter the room ID in number format", "red"))
+        else:
+            # prints the output from the method
+            print(self.amity.delete_room(args['<roomid>']))
 
     @docopt_cmd
     def do_save_state(self, args):
