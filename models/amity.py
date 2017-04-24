@@ -531,16 +531,7 @@ class Amity:
                         given_room.append(given_lspace)
                         for room in rooms:
                             # check where room is the same as what was given
-                            if (room_object.room_type.upper() == "OFFICE" and
-                                    given_room[0].upper() != room_object.room_name.upper()):
-                                returnmsg = (colored("{} cannot be assigned from a {}"
-                                                     "to a {}"
-                                                     .format(person_object.name,
-                                                             given_room[0].room_type.upper(
-                                                             ),
-                                                             room_object.room_type.upper()),
-                                                     "yellow"))
-                            elif room.room_name.title() in given_room:
+                            if room.room_name.title() in given_room:
                                 # deletes previous allocation
                                 room.allocations.remove(person_object)
                             # checks if person is in unallocated office list
