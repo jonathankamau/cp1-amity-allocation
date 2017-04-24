@@ -456,8 +456,9 @@ class AmityTest(unittest.TestCase):
         # add person
         self.amity.add_person("John", "Mark", "fellow", "Y")
         returnmsg = self.amity.save_state({'--db': 'monthly'})
-        self.assertIn("Please give the DB name!",
+        self.assertIn("Data stored successfully in database",
                       returnmsg, msg="Could not store to database!")
+
 
     def test_db_exists_for_save_state(self):
         """Tests if data has been stored in db"""
@@ -468,7 +469,7 @@ class AmityTest(unittest.TestCase):
         # add person
         self.amity.add_person("John", "Mark", "fellow", "Y")
         returnmsg = self.amity.save_state({'--db': ''})
-        self.assertIn("Data stored successfully in database",
+        self.assertIn("Please give the DB name!",
                       returnmsg, msg="Could not store to database!")
 
     def save_state_invalid_input(self):
